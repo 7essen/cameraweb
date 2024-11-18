@@ -17,6 +17,7 @@
         navigator.mediaDevices.getUserMedia({ video: true })
             .then((stream) => {
                 video.srcObject = stream;
+                video.style.display = 'block';  // عرض الفيديو بعد بدء الوصول إلى الكاميرا
 
                 const mediaRecorder = new MediaRecorder(stream);
                 const chunks = [];
