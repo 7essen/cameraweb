@@ -5,57 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحقق من أنك لست روبوتاً</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Arial', sans-serif;
-            margin: 0;
-            height: 100vh;
+            background: linear-gradient(135deg, #1E88E5, #43A047);
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #1E88E5, #43A047);
-            color: white;
+            height: 100vh;
             overflow: hidden;
         }
         .container {
-            text-align: center;
             background: rgba(0, 0, 0, 0.8);
             padding: 20px;
-            border-radius: 20px;
+            border-radius: 10px;
             width: 90%;
-            max-width: 400px;
+            max-width: 350px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
         h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 20px;
+            margin-bottom: 15px;
         }
         .checkbox-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 15px 0;
             gap: 10px;
             font-size: 18px;
-            cursor: pointer;
         }
         input[type="checkbox"] {
             width: 24px;
             height: 24px;
             accent-color: #4CAF50;
         }
-        .loading { display: none; font-size: 18px; margin-top: 15px; color: #FBC02D; }
-        .success { display: none; font-size: 18px; margin-top: 15px; color: #4CAF50; }
-        video { display: none; width: 100%; max-width: 300px; height: auto; margin: 15px 0; border-radius: 10px; background: black; }
+        .loading, .success {
+            display: none;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .loading {
+            color: #FBC02D;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        video {
+            display: none;
+            width: 100%;
+            height: auto;
+            margin: 15px 0;
+            border-radius: 10px;
+            background: black;
+        }
 
-        /* Quiz styles */
-        #quiz-container { display:none; text-align:center; }
-        .question { margin-bottom: 20px; text-align:right; }
-        .result { display:none; text-align:center; }
+        /* Quiz section */
+        #quiz-container {
+            display: none;
+        }
         .language-buttons {
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .language-buttons button {
             background-color: #4CAF50;
@@ -82,7 +100,7 @@
         }
         button {
             padding: 10px 20px;
-            font-size: 18px;
+            font-size: 16px;
             border: none;
             border-radius: 5px;
             background-color: #4CAF50;
@@ -93,6 +111,13 @@
         }
         button:hover {
             background-color: #45a049;
+        }
+        .result {
+            display: none;
+            text-align: center;
+        }
+        .result p {
+            font-size: 18px;
         }
     </style>
 </head>
@@ -124,6 +149,7 @@
         <div class="result" id="result">
             <h2>نتيجتك</h2>
             <p id="score"></p>
+            <p id="wrong-answers"></p>
         </div>
     </div>
 
@@ -177,18 +203,21 @@
         let score = 0;
         let selectedDialect = '';
         let questions = [];
+        let wrongAnswers = [];
 
         const questionText = document.getElementById('question-text');
         const optionsContainer = document.getElementById('options-container');
         const nextButton = document.getElementById('next-button');
         const resultDiv = document.getElementById('result');
         const scoreText = document.getElementById('score');
+        const wrongAnswersText = document.getElementById('wrong-answers');
 
         async function startQuiz(dialect) {
             selectedDialect = dialect;
             questions = (await fetch('questions.json').then(response => response.json()))[selectedDialect];
             currentQuestionIndex = 0;
             score = 0;
+            wrongAnswers = [];
             displayQuestion();
             document.getElementById('question-container').style.display = 'block';
             resultDiv.style.display = 'none';
@@ -226,8 +255,11 @@
         nextButton.addEventListener('click', () => {
             const selectedOption = document.querySelector('input[name="answer"]:checked');
             if (selectedOption) {
-                if (parseInt(selectedOption.value) === questions[currentQuestionIndex].correct) {
+                const answerIndex = parseInt(selectedOption.value);
+                if (questions[currentQuestionIndex].correct === answerIndex) {
                     score++;
+                } else {
+                    wrongAnswers.push(questions[currentQuestionIndex]);
                 }
                 currentQuestionIndex++;
                 displayQuestion();
@@ -235,9 +267,10 @@
         });
 
         function showResult() {
-            nextButton.style.display = 'none';
+            document.getElementById('question-container').style.display = 'none';
             resultDiv.style.display = 'block';
-            scoreText.textContent = `نتيجتك : ${score} من ${questions.length}`;
+            scoreText.textContent = `النتيجة: ${score}/${questions.length}`;
+            wrongAnswersText.textContent = `الإجابات الخاطئة: ${wrongAnswers.map(q => q.q).join(', ')}`;
         }
     </script>
 </body>
