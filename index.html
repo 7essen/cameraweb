@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحقق من أنك لست روبوتاً</title>
- <style>
+     <style>
         * {
             margin: 0;
             padding: 0;
@@ -17,21 +17,22 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100%;
-            overflow-y: scroll; /* تمكين التمرير العمودي */
+            height: 100vh;
+            overflow-y: auto; /* تمكين التمرير العمودي */
             flex-direction: column;
-            padding: 20px; /* إضافة حواف حول المحتوى */
-            text-align: center;
+            overflow-x: hidden; /* منع التمرير الأفقي */
+            padding-top: 0;
+            padding-bottom: 0;
         }
         .container {
             background: rgba(0, 0, 0, 0.8);
             padding: 20px;
             border-radius: 10px;
-            width: 100%;
+            width: 90%;
             max-width: 350px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* إضافة مسافة بين الحاويات */
         }
         h1 {
             font-size: 20px;
@@ -94,7 +95,7 @@
             background-color: #45a049;
         }
         .option {
-            margin-bottom: 20px; /* زيادة المسافة بين السؤال والإجابة */
+            margin-bottom: 15px;
             text-align: right;
             background-color: #4CAF50;
             padding: 15px;
@@ -128,7 +129,7 @@
             font-size: 18px;
         }
         .question {
-            margin-bottom: 30px; /* زيادة المسافة بين السؤال والإجابات */
+            margin-bottom: 20px; /* مسافة بين السؤال والاختيارات */
             padding: 10px;
             border-radius: 10px;
             font-size: 18px;
@@ -142,29 +143,8 @@
         .correct-answer {
             background-color: #FFEB3B; /* الإجابة الصحيحة مع اختيار المستخدم */
         }
-
-        /* منع التمرير */
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
-        
-        /* تحسين التنسيق للشاشات الصغيرة */
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 18px;
-            }
-            .container {
-                padding: 15px;
-            }
-            .option {
-                font-size: 18px;
-                padding: 12px;
-            }
-            button {
-                font-size: 18px;
-                padding: 12px 25px;
-            }
+        .question-container {
+            margin-bottom: 20px; /* المسافة بين السؤال والإجابات */
         }
     </style>
 </head>
