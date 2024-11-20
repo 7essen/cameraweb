@@ -19,7 +19,6 @@
             align-items: center;
             padding: 20px;
             color: #333;
-            font-size: 18px;
         }
         .container {
             background: rgba(255, 255, 255, 0.9);
@@ -30,7 +29,6 @@
             padding: 30px;
             text-align: center;
             animation: fadeIn 0.5s ease;
-            font-size: 20px;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -91,7 +89,6 @@
         .quiz-section h2 {
             margin-bottom: 15px;
             color: #2c3e50;
-            font-size: 24px;
         }
         .option {
             display: flex;
@@ -101,7 +98,6 @@
             border-radius: 8px;
             padding: 10px;
             transition: background-color 0.3s;
-            font-size: 18px;
         }
         .option input[type="radio"] {
             margin-left: 10px;
@@ -209,17 +205,7 @@
                 { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
                 { q: "ما معنى 'فايق'؟", options: ["مستيقظ", "مريض", "غاضب", "مستمتع"], correct: 0 },
                 { q: "ماذا تعني كلمة 'دِرَاج'؟", options: ["بسيط", "غريب", "درّاجه", "غرفه"], correct: 2 },
-                { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 },
-                { q: "ما معنى 'زغرطة'؟", options: ["صراخ", "غناء", "تهليل", "رقص"], correct: 2 },
-                { q: "ماذا تعني 'إمبارح'؟", options: ["غداً", "أمس", "اليوم", "الآن"], correct: 1 },
-                { q: "ما معنى 'بلكونة'؟", options: ["شرفة", "غرفة", "مطبخ", "سطح"], correct: 0 },
-                { q: "ماذا تعني 'عربية'؟", options: ["سيارة", "عربة", "شاحنة", "دراجة"], correct: 0 },
-                { q: "ما معنى 'مزيكا'؟", options: ["رقص", "موسيقى", "غناء", "تمثيل"], correct: 1 },
-                { q: "ماذا تعني 'أفندم'؟", options: ["نعم", "سيدي", "تفضل", "حسناً"], correct: 1 },
-                { q: "ما معنى 'إيه دا'؟", options: ["ماذا هذا", "كيف هذا", "لماذا", "متى"], correct: 0 },
-                { q: "ماذا تعني 'عايز'؟", options: ["تريد", "تحب", "ستذهب", "ستأتي"], correct: 0 },
-                { q: "ما معنى 'شكلك'؟", options: ["مظهرك", "ملابسك", "وجهك", "شخصيتك"], correct: 0 },
-                { q: "ماذا تعني 'خالص'؟", options: ["تماماً", "كثيراً", "قليلاً", "أحياناً"], correct: 0 }
+                { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 }
             ],
             "منياوي": [
                 { q: "ماذا تعني 'أبا'؟", options: ["أنا", "أبي", "أنت", "نعم"], correct: 1 },
@@ -290,6 +276,9 @@
                     radioInput.name = 'answer';
                     radioInput.value = shuffledOptions.indexOf(option);
                     radioInput.id = `option${index}`;
+                    optionDiv.addEventListener('click', () => {
+                        radioInput.checked = true;
+                    });
                     const label = document.createElement('label');
                     label.htmlFor = `option${index}`;
                     label.textContent = option;
@@ -320,38 +309,8 @@
             nextButton.style.display = 'none';
             document.getElementById('question-container').style.display = 'none';
             resultDiv.style.display = 'block';
-            
-            let resultMessage = '';
-            const percentage = (score / questions.length) * 100;
-            
-            if (percentage === 100) {
-                resultMessage = 'إتقان تام! أحسنت 🏆';
-            } else if (percentage >= 80) {
-                resultMessage = 'ممتاز! مستوى عالي 👏';
-            } else if (percentage >= 60) {
-                resultMessage = 'جيد! حاول مرة أخرى 👍';
-            } else {
-                resultMessage = 'لا بأس، يمكنك التحسن 🌟';
-            }
-
-            scoreText.innerHTML = `نتيجتك : ${score} من ${questions.length}<br>${resultMessage}`;
+            scoreText.textContent = `نتيجتك : ${score} من ${questions.length}`;
         }
-
-        function setupQuizInteraction() {
-            optionsContainer.addEventListener('click', (event) => {
-                const optionElement = event.target.closest('.option');
-                if (optionElement) {
-                    const radioInput = optionElement.querySelector('input[type="radio"]');
-                    radioInput.checked = true;
-                    
-                    // Trigger next button click if desired
-                    nextButton.click();
-                }
-            });
-        }
-
-        // Call this function after initial setup
-        setupQuizInteraction();
     </script>
 </body>
 </html>
