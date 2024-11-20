@@ -4,150 +4,169 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحقق من أنك لست روبوتاً</title>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    body {
-        font-family: 'Arial', sans-serif;
-        background: linear-gradient(135deg, #1E88E5, #43A047);
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh; /* يضبط الارتفاع ليتناسب مع الشاشة */
-        overflow-y: scroll;
-        flex-direction: column;
-        padding: 10px; /* إضافة مسافة صغيرة من الحواف */
-    }
-    .container {
-        background: rgba(0, 0, 0, 0.8);
-        padding: 20px;
-        border-radius: 10px;
-        width: 100%; /* لجعل الحاوية تغطي كامل عرض الشاشة */
-        max-width: 350px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        text-align: center;
-        margin-top: 10px;
-    }
-    h1 {
-        font-size: 20px;
-        margin-bottom: 15px;
-    }
-    .checkbox-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-        font-size: 18px;
-    }
-    input[type="checkbox"] {
-        width: 24px;
-        height: 24px;
-        accent-color: #4CAF50;
-    }
-    .loading, .success {
-        display: none;
-        font-size: 16px;
-        margin-top: 10px;
-    }
-    .loading {
-        color: #FBC02D;
-    }
-    .success {
-        color: #4CAF50;
-    }
-    video {
-        display: none;
-        width: 100%;
-        height: auto;
-        margin: 15px 0;
-        border-radius: 10px;
-        background: black;
-    }
+ <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1E88E5, #43A047);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            overflow-y: scroll; /* تمكين التمرير العمودي */
+            flex-direction: column;
+            padding: 20px; /* إضافة حواف حول المحتوى */
+            text-align: center;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .checkbox-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+        }
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            accent-color: #4CAF50;
+        }
+        .loading, .success {
+            display: none;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .loading {
+            color: #FBC02D;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        video {
+            display: none;
+            width: 100%;
+            height: auto;
+            margin: 15px 0;
+            border-radius: 10px;
+            background: black;
+        }
 
-    /* Quiz section */
-    #quiz-container {
-        display: none;
-    }
-    .language-buttons {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 20px;
-        margin-bottom: 15px;
-    }
-    .language-buttons button {
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 15px 20px;
-        cursor: pointer;
-        font-size: 20px;
-        transition: background-color 0.3s;
-    }
-    .language-buttons button:hover {
-        background-color: #45a049;
-    }
-    .option {
-        margin-bottom: 15px;
-        text-align: right;
-        background-color: #4CAF50;
-        padding: 15px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 20px;
-        transition: background-color 0.3s;
-    }
-    .option:hover {
-        background-color: #45a049;
-    }
-    button {
-        padding: 15px 30px;
-        font-size: 20px;
-        border: none;
-        border-radius: 20px;
-        background-color: #4CAF50;
-        color: white;
-        cursor: pointer;
-        margin-top: 15px;
-        transition: background-color 0.3s;
-    }
-    button:hover {
-        background-color: #45a049;
-    }
-    .result {
-        display: none;
-        text-align: center;
-    }
-    .result p {
-        font-size: 18px;
-    }
-    .question {
-        margin-bottom: 25px; /* زيادة المسافة بين السؤال والإجابة */
-        padding: 10px;
-        border-radius: 10px;
-        font-size: 18px;
-    }
-    .correct {
-        background-color: #4CAF50;
-    }
-    .wrong {
-        background-color: #F44336;
-    }
-    .correct-answer {
-        background-color: #FFEB3B;
-    }
+        /* Quiz section */
+        #quiz-container {
+            display: none;
+        }
+        .language-buttons {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .language-buttons button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: background-color 0.3s;
+        }
+        .language-buttons button:hover {
+            background-color: #45a049;
+        }
+        .option {
+            margin-bottom: 20px; /* زيادة المسافة بين السؤال والإجابة */
+            text-align: right;
+            background-color: #4CAF50;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: background-color 0.3s;
+        }
+        .option:hover {
+            background-color: #45a049;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            display: none;
+            text-align: center;
+        }
+        .result p {
+            font-size: 18px;
+        }
+        .question {
+            margin-bottom: 30px; /* زيادة المسافة بين السؤال والإجابات */
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+        .correct {
+            background-color: #4CAF50; /* الإجابة الصحيحة */
+        }
+        .wrong {
+            background-color: #F44336; /* الإجابة الخاطئة */
+        }
+        .correct-answer {
+            background-color: #FFEB3B; /* الإجابة الصحيحة مع اختيار المستخدم */
+        }
 
-    /* منع التمرير */
-    html, body {
-        height: 100%;
-        overflow: hidden;
-    }
-</style>
+        /* منع التمرير */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        /* تحسين التنسيق للشاشات الصغيرة */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 18px;
+            }
+            .container {
+                padding: 15px;
+            }
+            .option {
+                font-size: 18px;
+                padding: 12px;
+            }
+            button {
+                font-size: 18px;
+                padding: 12px 25px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container" id="verification-container">
