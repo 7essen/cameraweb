@@ -18,8 +18,11 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow: hidden; /* إيقاف التمرير */
+            overflow-y: auto; /* تمكين التمرير العمودي */
             flex-direction: column;
+            overflow-x: hidden; /* منع التمرير الأفقي */
+            padding-top: 0;
+            padding-bottom: 0;
         }
         .container {
             background: rgba(0, 0, 0, 0.8);
@@ -29,6 +32,7 @@
             max-width: 350px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             text-align: center;
+            margin-bottom: 20px; /* إضافة مسافة بين الحاويات */
         }
         h1 {
             font-size: 20px;
@@ -120,14 +124,18 @@
         .result {
             display: none;
             text-align: center;
+            max-height: 80vh; /* تعيين الحد الأقصى لارتفاع الحاوية */
+            overflow-y: auto; /* تمكين التمرير العمودي */
+            padding: 20px;
         }
         .result p {
             font-size: 18px;
         }
         .question {
-            margin-bottom: 15px;
-            padding: 10px;
+            margin-bottom: 60px; /* مسافة بين السؤال والاختيارات */
+            padding: 40px;
             border-radius: 10px;
+            font-size: 18px;
         }
         .correct {
             background-color: #4CAF50; /* الإجابة الصحيحة */
@@ -138,11 +146,18 @@
         .correct-answer {
             background-color: #FFEB3B; /* الإجابة الصحيحة مع اختيار المستخدم */
         }
+        .question-container {
+            margin-bottom: 20px; /* المسافة بين السؤال والإجابات */
+        }
 
-        /* منع التمرير */
-        html, body {
-            height: 100%;
-            overflow: hidden;
+        /* إضافة مسافة بين نص السؤال والإجابات */
+        #question-text {
+            margin-bottom: 30px; /* مسافة بين نص السؤال والإجابات */
+        }
+        #all-questions {
+            max-height: 400px; /* يمكنك تعديل الارتفاع حسب الحاجة */
+            overflow-y: auto; /* تمكين التمرير العمودي */
+            padding: 10px;
         }
     </style>
 </head>
