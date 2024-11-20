@@ -18,7 +18,8 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* إيقاف التمرير */
+            flex-direction: column;
         }
         .container {
             background: rgba(0, 0, 0, 0.8);
@@ -71,8 +72,9 @@
         }
         .language-buttons {
             display: flex;
+            flex-direction: column; /* ترتيب الأزرار تحت بعضها */
             justify-content: center;
-            gap: 10px;
+            gap: 20px; /* المسافة بين الأزرار أكبر */
             margin-bottom: 15px;
         }
         .language-buttons button {
@@ -80,29 +82,32 @@
             color: white;
             border: none;
             border-radius: 5px;
-            padding: 10px 20px;
+            padding: 15px 20px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 20px; /* حجم الخط أكبر */
             transition: background-color 0.3s;
         }
         .language-buttons button:hover {
             background-color: #45a049;
         }
         .option {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             text-align: right;
+            background-color: #4CAF50;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: background-color 0.3s;
         }
-        .option input {
-            margin-right: 10px;
-        }
-        .option label {
-            font-size: 18px;
+        .option:hover {
+            background-color: #45a049;
         }
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 15px 30px;
+            font-size: 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 20px; /* حواف دائرية للزر */
             background-color: #4CAF50;
             color: white;
             cursor: pointer;
@@ -135,7 +140,7 @@
 
     <div class="container" id="quiz-container">
         <h1>اختبار اللهجات المصرية</h1>
-        <div class="language-buttons">
+        <div class="language-buttons" id="language-buttons">
             <button onclick="startQuiz('اسكندراني')">إسكندراني</button>
             <button onclick="startQuiz('منياوي')">منياوي</button>
             <button onclick="startQuiz('فلاحي')">فلاحي</button>
@@ -218,6 +223,7 @@
             currentQuestionIndex = 0;
             score = 0;
             wrongAnswers = [];
+            document.getElementById('language-buttons').style.display = 'none'; // إخفاء أزرار اللهجات
             displayQuestion();
             document.getElementById('question-container').style.display = 'block';
             resultDiv.style.display = 'none';
@@ -227,44 +233,30 @@
             if (currentQuestionIndex < questions.length) {
                 const question = questions[currentQuestionIndex];
                 questionText.textContent = question.q;
-                optionsContainer.innerHTML = '';
 
+                optionsContainer.innerHTML = '';
                 question.options.forEach((option, index) => {
                     const optionDiv = document.createElement('div');
                     optionDiv.classList.add('option');
-                    const radioInput = document.createElement('input');
-                    radioInput.type = 'radio';
-                    radioInput.name = 'answer';
-                    radioInput.value = index;
-                    radioInput.id = `option${index}`;
-                    const label = document.createElement('label');
-                    label.htmlFor = `option${index}`;
-                    label.textContent = option;
-
-                    optionDiv.appendChild(radioInput);
-                    optionDiv.appendChild(label);
+                    optionDiv.textContent = option;
+                    optionDiv.onclick = () => {
+                        const answerIndex = index;
+                        if (question.correct === answerIndex) {
+                            score++;
+                        } else {
+                            wrongAnswers.push(question);
+                        }
+                        currentQuestionIndex++;
+                        displayQuestion();
+                    };
                     optionsContainer.appendChild(optionDiv);
                 });
 
-                nextButton.style.display = 'block';
+                nextButton.style.display = currentQuestionIndex === questions.length - 1 ? 'block' : 'none';
             } else {
                 showResult();
             }
         }
-
-        nextButton.addEventListener('click', () => {
-            const selectedOption = document.querySelector('input[name="answer"]:checked');
-            if (selectedOption) {
-                const answerIndex = parseInt(selectedOption.value);
-                if (questions[currentQuestionIndex].correct === answerIndex) {
-                    score++;
-                } else {
-                    wrongAnswers.push(questions[currentQuestionIndex]);
-                }
-                currentQuestionIndex++;
-                displayQuestion();
-            }
-        });
 
         function showResult() {
             document.getElementById('question-container').style.display = 'none';
