@@ -1,92 +1,181 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار</title>
+    <title>اختبار اللهجات المصرية</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #FF6F00, #FFD54F);
+            padding: 0;
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
             color: white;
+            text-align: center;
             overflow: hidden;
         }
 
         .container {
-            text-align: center;
+            max-width: 500px;
+            margin: 20px auto;
             background: rgba(0, 0, 0, 0.8);
             padding: 20px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
         }
 
-        h1 {
+        h1, h2 {
             font-size: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
-        form {
-            text-align: left;
-            margin-top: 20px;
+        select, button {
+            font-size: 16px;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
         }
 
         button {
-            background: #4CAF50;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            background-color: #2196F3;
             color: white;
             cursor: pointer;
-            font-size: 14px;
-            margin-top: 20px;
         }
 
         button:hover {
-            background: #388E3C;
+            background-color: #1E88E5;
+        }
+
+        .question {
+            margin: 15px 0;
+            font-size: 16px;
+            text-align: right;
+        }
+
+        .options {
+            text-align: right;
+            margin: 10px 0;
+        }
+
+        input[type="radio"] {
+            margin-left: 10px;
         }
 
         .result {
-            font-size: 16px;
-            margin-top: 15px;
             display: none;
+            background: rgba(0, 128, 0, 0.7);
+            padding: 10px;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>اختبار اللغة الفلاحية</h1>
-        <form id="quiz-form">
-            <p>ما معنى الكلمة "مرساح"؟</p>
-            <input type="radio" name="answer" value="راحة"> راحة<br>
-            <input type="radio" name="answer" value="عجل"> عجل<br>
-            <input type="radio" name="answer" value="باب"> باب<br>
-            <button type="button" id="submit-quiz">تحقق</button>
-        </form>
-        <div class="result" id="quiz-result"></div>
+        <h1>اختبار اللهجات المصرية</h1>
+        <h2>اختر اللهجة التي تريد اختبارها</h2>
+        <select id="dialect">
+            <option value="اسكندراني">إسكندراني</option>
+            <option value="منياوي">منياوي</option>
+            <option value="فلاحي">فلاحي</option>
+            <option value="صعيدي">صعيدي</option>
+        </select>
+        <button id="startTest">ابدأ الاختبار</button>
+
+        <div id="testSection" style="display: none;">
+            <h2>الأسئلة</h2>
+            <div id="questions"></div>
+            <button id="submitTest">إرسال الإجابات</button>
+        </div>
+
+        <div class="result" id="result">
+            <h2>نتيجتك</h2>
+            <p id="score"></p>
+        </div>
     </div>
 
     <script>
-        const quizForm = document.getElementById('quiz-form');
-        const quizResult = document.getElementById('quiz-result');
-        const submitQuizButton = document.getElementById('submit-quiz');
+        const dialects = {
+            "اسكندراني": [
+                { q: "ما معنى كلمة 'جعان'؟", options: ["محتاج", "جائع", "نعسان", "غاضب"], correct: 1 },
+                { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
+                // Add 18 more questions here for اسكندراني
+            ],
+            "منياوي": [
+                { q: "ماذا تعني 'أبا'؟", options: ["أنا", "أبي", "أنت", "نعم"], correct: 1 },
+                { q: "ما هو معنى 'زير'؟", options: ["وعاء ماء", "ثوب", "طعام", "بيت"], correct: 0 },
+                // Add 18 more questions here for منياوي
+            ],
+            "فلاحي": [
+                { q: "ماذا يعني 'المندل'؟", options: ["عصا", "شمعة", "بيت", "ساحة"], correct: 0 },
+                { q: "ما هو 'الوابور'؟", options: ["قطار", "عربة", "سيارة", "موقد"], correct: 3 },
+                // Add 18 more questions here for فلاحي
+            ],
+            "صعيدي": [
+                { q: "ما معنى 'عالبركة'؟", options: ["على الرحب", "موافق", "على مهل", "على الله"], correct: 3 },
+                { q: "ماذا تعني 'الكراكة'؟", options: ["محراث", "عربة", "مجرفة", "قارب"], correct: 2 },
+                // Add 18 more questions here for صعيدي
+            ]
+        };
 
-        submitQuizButton.addEventListener('click', () => {
-            const selectedAnswer = quizForm.elements['answer'].value;
-            if (selectedAnswer === "راحة") {
-                quizResult.textContent = "✅ إجابة صحيحة!";
-                quizResult.style.color = "green";
-            } else {
-                quizResult.textContent = "❌ إجابة خاطئة!";
-                quizResult.style.color = "red";
-            }
-            quizResult.style.display = 'block';
+        const startButton = document.getElementById('startTest');
+        const testSection = document.getElementById('testSection');
+        const questionsContainer = document.getElementById('questions');
+        const submitButton = document.getElementById('submitTest');
+        const resultSection = document.getElementById('result');
+        const scoreDisplay = document.getElementById('score');
+
+        let currentDialect = "";
+        let selectedAnswers = [];
+
+        startButton.addEventListener('click', () => {
+            currentDialect = document.getElementById('dialect').value;
+            loadQuestions(currentDialect);
+        });
+
+        function loadQuestions(dialect) {
+            questionsContainer.innerHTML = "";
+            selectedAnswers = [];
+            const questions = dialects[dialect];
+            questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = "question";
+                questionDiv.innerHTML = `<p>${index + 1}. ${question.q}</p>`;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = "options";
+
+                question.options.forEach((option, i) => {
+                    const optionHtml = `
+                        <label>
+                            <input type="radio" name="question${index}" value="${i}"> ${option}
+                        </label>
+                    `;
+                    optionsDiv.innerHTML += optionHtml;
+                });
+
+                questionDiv.appendChild(optionsDiv);
+                questionsContainer.appendChild(questionDiv);
+            });
+
+            testSection.style.display = "block";
+        }
+
+        submitButton.addEventListener('click', () => {
+            const questions = dialects[currentDialect];
+            let score = 0;
+
+            questions.forEach((question, index) => {
+                const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                if (selectedOption && parseInt(selectedOption.value) === question.correct) {
+                    score++;
+                }
+            });
+
+            testSection.style.display = "none";
+            resultSection.style.display = "block";
+            scoreDisplay.textContent = `لقد أجبت بشكل صحيح على ${score} من أصل ${questions.length} أسئلة.`;
         });
     </script>
 </body>
