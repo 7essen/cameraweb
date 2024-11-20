@@ -1,135 +1,139 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحقق من أنك لست روبوتاً</title>
+    <title>Quiz with Video</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #1E88E5, #43A047);
-            color: white;
-            overflow: hidden;
+            font-family: Arial, sans-serif;
+            direction: rtl;
         }
-
-        .container {
-            text-align: center;
-            background: rgba(0, 0, 0, 0.8);
+        #quizContainer {
+            margin-top: 50px;
             padding: 20px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        h1 {
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .checkbox-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 15px 0;
-            gap: 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: #4CAF50;
-            transition: transform 0.3s ease;
-        }
-
-        input[type="checkbox"]:checked {
-            transform: scale(1.2);
-        }
-
-        .loading {
-            display: none;
-            font-size: 16px;
-            margin-top: 15px;
-            color: #FBC02D;
-        }
-
-        .success {
-            display: none;
-            font-size: 16px;
-            margin-top: 15px;
-            color: #4CAF50;
-        }
-
-        video {
-            display: none;
-            width: 100%;
-            max-width: 300px;
-            height: auto;
-            margin: 15px 0;
+            background-color: #f9f9f9;
             border-radius: 10px;
-            background: black;
+        }
+        #videoContainer {
+            display: none; /* Hide video until quiz page */
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 50%;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
-    <div class="container" id="verification-container">
-        <h1>تحقق من أنك لست روبوتاً</h1>
-        <div class="checkbox-container">
-            <input type="checkbox" id="robot-checkbox">
-            <label for="robot-checkbox">أنا لست روبوتاً</label>
-        </div>
-        <video id="video" autoplay playsinline muted></video>
-        <div class="loading">جاري التسجيل... ⏳</div>
-        <div class="success">✅ تم التحقق بنجاح!</div>
+
+<!-- Verification Page (Initial Page) -->
+<div id="verificationPage">
+    <h1>التحقق</h1>
+    <button id="startQuiz">ابدأ الاختبار</button>
+</div>
+
+<!-- Quiz Page -->
+<div id="quizContainer" style="display: none;">
+    <h1>اختبار اللهجة</h1>
+    <select id="dialect">
+        <option value="قاهري">قاهري</option>
+        <option value="صعيدي">صعيدي</option>
+    </select>
+    <button id="startTest">ابدأ الاختبار</button>
+
+    <div id="testSection" style="display: none;">
+        <div id="questions"></div>
+        <button id="submitTest">إرسال الإجابات</button>
     </div>
 
-    <script>
-        const video = document.getElementById('video');
-        const checkbox = document.getElementById('robot-checkbox');
-        const loading = document.querySelector('.loading');
-        const success = document.querySelector('.success');
-        const verificationContainer = document.getElementById('verification-container');
+    <div id="result" style="display: none;">
+        <p id="score"></p>
+    </div>
+</div>
 
-        checkbox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                video.style.display = 'block';
-                loading.style.display = 'block';
-                success.style.display = 'none';
+<!-- Video Container (Hidden initially) -->
+<div id="videoContainer">
+    <video id="videoPlayer" width="100%" controls autoplay>
+        <source src="your_video_source_here.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
 
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then((stream) => {
-                        video.srcObject = stream;
-                        const mediaRecorder = new MediaRecorder(stream);
-                        const chunks = [];
+<script>
+    // Control Flow
+    const startQuizBtn = document.getElementById('startQuiz');
+    const verificationPage = document.getElementById('verificationPage');
+    const quizPage = document.getElementById('quizContainer');
+    const videoContainer = document.getElementById('videoContainer');
+    const startTestBtn = document.getElementById('startTest');
+    const dialectSelect = document.getElementById('dialect');
+    const testSection = document.getElementById('testSection');
+    const questionsDiv = document.getElementById('questions');
+    const submitTestBtn = document.getElementById('submitTest');
+    const resultDiv = document.getElementById('result');
+    const scoreText = document.getElementById('score');
 
-                        mediaRecorder.start();
+    const dialects = {
+        "قاهري": [
+            { q: "ماذا تعني 'عجلة'؟", options: ["سيارة", "محطة", "مركب", "طائرة"], correct: 0 },
+            { q: "ما معنى 'شَبرَة'؟", options: ["نار", "طعام", "موقد", "صاروخ"], correct: 2 }
+        ],
+        "صعيدي": [
+            { q: "ماذا تعني 'كمش'؟", options: ["غسّل", "شرب", "فجر", "أمسك"], correct: 3 }
+        ]
+    };
 
-                        mediaRecorder.ondataavailable = (event) => {
-                            chunks.push(event.data);
-                        };
+    // When clicking 'ابدأ الاختبار' on the verification page
+    startQuizBtn.addEventListener('click', () => {
+        verificationPage.style.display = 'none'; // Hide verification page
+        quizPage.style.display = 'block'; // Show quiz page
+        videoContainer.style.display = 'block'; // Show video player on quiz page
+    });
 
-                        setTimeout(() => {
-                            mediaRecorder.stop();
-                        }, 5000); // Record for 5 seconds
+    // When clicking 'ابدأ الاختبار' on the quiz page
+    startTestBtn.addEventListener('click', () => {
+        const selectedDialect = dialectSelect.value;
+        const questions = dialects[selectedDialect];
 
-                        mediaRecorder.onstop = () => {
-                            loading.style.display = 'none';
-                            success.style.display = 'block';
-                            stream.getTracks().forEach(track => track.stop());
-                        };
-                    })
-                    .catch((err) => {
-                        alert("Unable to access the camera: " + err.message);
-                    });
+        testSection.style.display = 'block';
+        resultDiv.style.display = 'none';
+        questionsDiv.innerHTML = '';
+
+        questions.forEach((question, index) => {
+            const qDiv = document.createElement('div');
+            qDiv.classList.add('question');
+
+            const questionText = document.createElement('p');
+            questionText.textContent = question.q;
+
+            const options = question.options.map((option, i) => `
+                <input type="radio" name="question${index}" value="${i}" id="q${index}_o${i}">
+                <label for="q${index}_o${i}">${option}</label><br>
+            `).join('');
+
+            qDiv.innerHTML = `${questionText.outerHTML}${options}`;
+            questionsDiv.appendChild(qDiv);
+        });
+    });
+
+    // When submitting the test
+    submitTestBtn.addEventListener('click', () => {
+        let score = 0;
+        const selectedDialect = dialectSelect.value;
+        const questions = dialects[selectedDialect];
+
+        questions.forEach((question, index) => {
+            const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+            if (selectedOption && parseInt(selectedOption.value) === question.correct) {
+                score++;
             }
         });
-    </script>
+
+        scoreText.textContent = `نتيجتك: ${score} من ${questions.length}`;
+        resultDiv.style.display = 'block';
+    });
+</script>
+
 </body>
 </html>
