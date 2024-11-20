@@ -21,8 +21,8 @@
             overflow-y: auto; /* تمكين التمرير العمودي */
             flex-direction: column;
             overflow-x: hidden; /* منع التمرير الأفقي */
-            padding-top: 0;
-            padding-bottom: 0;
+            padding-top: 10px; /* إضافة مساحة من الأعلى */
+            padding-bottom: 10px; /* إضافة مساحة من الأسفل */
         }
         .container {
             background: rgba(0, 0, 0, 0.8);
@@ -143,9 +143,6 @@
         .correct-answer {
             background-color: #FFEB3B; /* الإجابة الصحيحة مع اختيار المستخدم */
         }
-        .question-container {
-            margin-bottom: 20px; /* المسافة بين السؤال والإجابات */
-        }
     </style>
 </head>
 <body>
@@ -239,13 +236,13 @@
 
         async function startQuiz(dialect) {
             selectedDialect = dialect;
-            questions = await fetch(`questions_${dialect}.json`).then(response => response.json());
+            questions = (await fetch('questions.json').then(response => response.json()))[selectedDialect];
             currentQuestionIndex = 0;
             score = 0;
-            answers = [];
             wrongAnswers = [];
-            displayQuestion();
+            answers = [];
             document.getElementById('language-buttons').style.display = 'none';
+            displayQuestion();
             document.getElementById('question-container').style.display = 'block';
         }
 
