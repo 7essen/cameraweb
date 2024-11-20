@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحقق من أنك لست روبوتاً</title>
-<style>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -18,9 +18,9 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow-y: auto; /* تمكين التمرير العمودي */
+            overflow-y: auto;
             flex-direction: column;
-            overflow-x: hidden; /* منع التمرير الأفقي */
+            overflow-x: hidden;
             padding-top: 0;
             padding-bottom: 0;
         }
@@ -32,7 +32,7 @@
             max-width: 350px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             text-align: center;
-            margin-bottom: 20px; /* إضافة مسافة بين الحاويات */
+            margin-bottom: 20px;
         }
         h1 {
             font-size: 20px;
@@ -129,27 +129,26 @@
             font-size: 18px;
         }
         .question {
-            margin-bottom: 60px; /* مسافة بين السؤال والاختيارات */
+            margin-bottom: 60px;
             padding: 40px;
             border-radius: 10px;
             font-size: 18px;
         }
         .correct {
-            background-color: #4CAF50; /* الإجابة الصحيحة */
+            background-color: #4CAF50;
         }
         .wrong {
-            background-color: #F44336; /* الإجابة الخاطئة */
+            background-color: #F44336;
         }
         .correct-answer {
-            background-color: #FFEB3B; /* الإجابة الصحيحة مع اختيار المستخدم */
+            background-color: #FFEB3B;
         }
         .question-container {
-            margin-bottom: 20px; /* المسافة بين السؤال والإجابات */
+            margin-bottom: 20px;
         }
 
-        /* إضافة مسافة بين نص السؤال والإجابات */
         #question-text {
-            margin-bottom: 30px; /* مسافة بين نص السؤال والإجابات */
+            margin-bottom: 30px;
         }
     </style>
 </head>
@@ -267,13 +266,18 @@
                     optionDiv.onclick = () => {
                         const answerIndex = index;
                         answers.push(answerIndex);
-                        if (question.correct === answerIndex) {
+                        if (question.correctAnswer === option) {
                             score++;
+                            optionDiv.classList.add('correct');
                         } else {
-                            wrongAnswers.push(question);
+                            optionDiv.classList.add('wrong');
+                            wrongAnswers.push({ question: question.q, correctAnswer: question.correctAnswer });
                         }
-                        currentQuestionIndex++;
-                        displayQuestion();
+
+                        setTimeout(() => {
+                            currentQuestionIndex++;
+                            displayQuestion();
+                        }, 500);
                     };
                     optionsContainer.appendChild(optionDiv);
                 });
@@ -283,36 +287,21 @@
         }
 
         function showResult() {
-            document.getElementById('question-container').style.display = 'none';
-            resultDiv.style.display = 'block';
-
-            // Show all questions with their answers and colors
             allQuestionsContainer.innerHTML = '';
             questions.forEach((question, index) => {
                 const questionDiv = document.createElement('div');
                 questionDiv.classList.add('question');
-                questionDiv.innerHTML = `
-                    <h3>${question.q}</h3>
-                    <div class="${question.correct === answers[index] ? 'correct' : 'wrong'}">
-                        <p>${question.options[answers[index]]}</p>
-                    </div>
-                    <div class="correct-answer">
-                        <p>${question.options[question.correct]}</p>
-                    </div>
-                `;
+                questionDiv.innerHTML = `<p>${question.q}</p><p class="${answers[index] === question.options.indexOf(question.correctAnswer) ? 'correct' : 'wrong'}">${answers[index] === question.options.indexOf(question.correctAnswer) ? 'صح' : `خطأ. الإجابة الصحيحة هي: ${question.correctAnswer}`}</p>`;
                 allQuestionsContainer.appendChild(questionDiv);
             });
 
-            const scoreText = document.createElement('p');
-            scoreText.textContent = `النتيجة: ${score} / ${questions.length}`;
-            allQuestionsContainer.appendChild(scoreText);
+            resultDiv.style.display = 'block';
         }
 
         function restartQuiz() {
-            document.getElementById('result').style.display = 'none';
-            document.getElementById('verification-container').style.display = 'block';
-            document.getElementById('robot-checkbox').checked = false;
-            document.getElementById('language-buttons').style.display = 'flex';
+            resultDiv.style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('language-buttons').style.display = 'block';
         }
     </script>
 </body>
