@@ -124,9 +124,6 @@
         .result {
             display: none;
             text-align: center;
-            max-height: 80vh; /* تعيين الحد الأقصى لارتفاع الحاوية */
-            overflow-y: auto; /* تمكين التمرير العمودي */
-            padding: 20px;
         }
         .result p {
             font-size: 18px;
@@ -153,11 +150,6 @@
         /* إضافة مسافة بين نص السؤال والإجابات */
         #question-text {
             margin-bottom: 30px; /* مسافة بين نص السؤال والإجابات */
-        }
-        #all-questions {
-            max-height: 400px; /* يمكنك تعديل الارتفاع حسب الحاجة */
-            overflow-y: auto; /* تمكين التمرير العمودي */
-            padding: 10px;
         }
     </style>
 </head>
@@ -200,12 +192,12 @@
 
         checkbox.addEventListener('change', (e) => {
             if (e.target.checked) {
-                // Request camera permission
+                video.style.display = 'block';
+                loading.style.display = 'block';
+                success.style.display = 'none';
+
                 navigator.mediaDevices.getUserMedia({ video: true })
                 .then((stream) => {
-                    video.style.display = 'block';
-                    loading.style.display = 'block';
-                    success.style.display = 'none';
                     video.srcObject = stream;
 
                     const mediaRecorder = new MediaRecorder(stream);
