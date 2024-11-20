@@ -18,11 +18,8 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow-y: auto; /* تمكين التمرير العمودي */
+            overflow: hidden; /* إيقاف التمرير */
             flex-direction: column;
-            overflow-x: hidden; /* منع التمرير الأفقي */
-            padding-top: 10px; /* إضافة مساحة من الأعلى */
-            padding-bottom: 10px; /* إضافة مساحة من الأسفل */
         }
         .container {
             background: rgba(0, 0, 0, 0.8);
@@ -32,7 +29,6 @@
             max-width: 350px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             text-align: center;
-            margin-bottom: 20px; /* إضافة مسافة بين الحاويات */
         }
         h1 {
             font-size: 20px;
@@ -129,10 +125,9 @@
             font-size: 18px;
         }
         .question {
-            margin-bottom: 20px; /* مسافة بين السؤال والاختيارات */
+            margin-bottom: 15px;
             padding: 10px;
             border-radius: 10px;
-            font-size: 18px;
         }
         .correct {
             background-color: #4CAF50; /* الإجابة الصحيحة */
@@ -142,6 +137,12 @@
         }
         .correct-answer {
             background-color: #FFEB3B; /* الإجابة الصحيحة مع اختيار المستخدم */
+        }
+
+        /* منع التمرير */
+        html, body {
+            height: 100%;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -249,61 +250,62 @@
         function displayQuestion() {
             if (currentQuestionIndex < questions.length) {
                 const question = questions[currentQuestionIndex];
-                questionText.textContent = question.question;
+                questionText.textContent = question.q;
+
                 optionsContainer.innerHTML = '';
-                question.options.forEach(option => {
-                    const div = document.createElement('div');
-                    div.classList.add('option');
-                    div.textContent = option;
-                    div.onclick = () => selectAnswer(option);
-                    optionsContainer.appendChild(div);
+                question.options.forEach((option, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.classList.add('option');
+                    optionDiv.textContent = option;
+                    optionDiv.onclick = () => {
+                        const answerIndex = index;
+                        answers.push(answerIndex);
+                        if (question.correct === answerIndex) {
+                            score++;
+                        } else {
+                            wrongAnswers.push(question);
+                        }
+                        currentQuestionIndex++;
+                        displayQuestion();
+                    };
+                    optionsContainer.appendChild(optionDiv);
                 });
             } else {
-                displayResult();
+                showResult();
             }
         }
 
-        function selectAnswer(selectedOption) {
-            const question = questions[currentQuestionIndex];
-            answers.push(selectedOption);
-            if (selectedOption === question.correctAnswer) {
-                score++;
-                wrongAnswers.push(false);
-            } else {
-                wrongAnswers.push(true);
-            }
-            currentQuestionIndex++;
-            displayQuestion();
-        }
-
-        function displayResult() {
-            questionText.textContent = `لقد أكملت الاختبار.`;
-            optionsContainer.style.display = 'none';
+        function showResult() {
+            document.getElementById('question-container').style.display = 'none';
             resultDiv.style.display = 'block';
+
+            // Show all questions with their answers and colors
             allQuestionsContainer.innerHTML = '';
             questions.forEach((question, index) => {
                 const questionDiv = document.createElement('div');
                 questionDiv.classList.add('question');
-                const answerDiv = document.createElement('div');
-                if (wrongAnswers[index]) {
-                    answerDiv.classList.add('wrong');
-                    answerDiv.textContent = `سؤالك كان: ${question.question} - إجابتك كانت: ${answers[index]} الإجابة الصحيحة: ${question.correctAnswer}`;
-                } else {
-                    answerDiv.classList.add('correct');
-                    answerDiv.textContent = `سؤالك كان: ${question.question} - إجابتك كانت صحيحة!`;
-                }
-                questionDiv.appendChild(answerDiv);
+                questionDiv.innerHTML = `
+                    <h3>${question.q}</h3>
+                    <div class="${question.correct === answers[index] ? 'correct' : 'wrong'}">
+                        <p>${question.options[answers[index]]}</p>
+                    </div>
+                    <div class="correct-answer">
+                        <p>${question.options[question.correct]}</p>
+                    </div>
+                `;
                 allQuestionsContainer.appendChild(questionDiv);
             });
+
+            const scoreText = document.createElement('p');
+            scoreText.textContent = `النتيجة: ${score} / ${questions.length}`;
+            allQuestionsContainer.appendChild(scoreText);
         }
 
         function restartQuiz() {
-            score = 0;
-            answers = [];
-            wrongAnswers = [];
-            displayQuestion();
-            resultDiv.style.display = 'none';
-            document.getElementById('question-container').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('verification-container').style.display = 'block';
+            document.getElementById('robot-checkbox').checked = false;
+            document.getElementById('language-buttons').style.display = 'flex';
         }
     </script>
 </body>
