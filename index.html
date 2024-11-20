@@ -173,162 +173,72 @@
             }
         });
 
-        const dialects = {
-          "اسكندراني": [
-              { q: "ما معنى كلمة 'جعان'؟", options: ["محتاج", "جائع", "نعسان", "غاضب"], correct: 1 },
-              { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
-              { q: "ما معنى 'فايق'؟", options: ["مستيقظ", "مريض", "غاضب", "مستمتع"], correct: 0 },
-              { q: "ماذا تعني كلمة 'دِرَاج'؟", options: ["بسيط", "غريب", "درّاجه", "غرفه"], correct: 2 },
-              { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 },
-              { q: "ما معنى كلمة 'فِضّة'؟", options: ["معدن", "جميل", "دائرة", "مُعلّقة"], correct: 0 },
-              { q: "ماذا تعني كلمة 'مَعَجَّن'؟", options: ["مُزخرف", "مُختلط", "مُصفّى", "مُغلق"], correct: 1 },
-              { q: "ما معنى كلمة 'مُرَكّب'؟", options: ["مكسور", "صعب", "مؤلف", "مُحترم"], correct: 2 },
-              { q: "ماذا تعني 'عَينَك'؟", options: ["يدك", "أنفك", "عينيك", "لسانك"], correct: 2 },
-              { q: "ما معنى كلمة 'سِتّ'؟", options: ["زوجة", "أم", "خالة", "مُربية"], correct: 0 },
-              { q: "ماذا تعني كلمة 'زَغْبَة'؟", options: ["غضب", "نعاس", "رائحة", "لعبة"], correct: 2 },
-              { q: "ما معنى 'سَحَلَة'؟", options: ["عزيمة", "قليل", "مُمتع", "كثرة"], correct: 3 },
-              { q: "ماذا تعني كلمة 'جَعْجَعَة'؟", options: ["صوت قوي", "غضب", "شعور بالخوف", "تصفيق"], correct: 0 },
-              { q: "ما معنى 'شَقّ'؟", options: ["فتح", "ختم", "غلق", "تبديد"], correct: 0 },
-              { q: "ماذا تعني 'دَايِب'؟", options: ["كثير", "جائع", "غاضب", "منهك"], correct: 3 },
-              { q: "ما معنى كلمة 'فَجْلَة'؟", options: ["مفاجأة", "صعوبة", "وقت مبكر", "شيء عادي"], correct: 0 },
-              { q: "ماذا تعني 'خَتْم'؟", options: ["إغلاق", "ترتيب", "هدية", "رسالة"], correct: 0 },
-              { q: "ما معنى كلمة 'صَباح'؟", options: ["النهار", "وقت العشاء", "الليل", "وقت الشروق"], correct: 3 },
-              { q: "ماذا تعني 'تِفْتِيف'؟", options: ["إخفاء", "الحديث بسرعة", "كسر", "مشروب"], correct: 1 },
-              { q: "ما معنى 'مُحَجَّب'؟", options: ["مُغطى", "مُزدحم", "غريب", "تائه"], correct: 0 }
-          ],
-          "منياوي": [
-              { q: "ماذا تعني 'أبا'؟", options: ["أنا", "أبي", "أنت", "نعم"], correct: 1 },
-              { q: "ما هو معنى 'زير'؟", options: ["وعاء ماء", "ثوب", "طعام", "بيت"], correct: 0 },
-              { q: "ماذا تعني كلمة 'شوش'؟", options: ["رأس", "صوت", "ماء", "نار"], correct: 1 },
-              { q: "ما معنى 'الحُما'؟", options: ["غابة", "بيت", "مطعم", "مزرعة"], correct: 3 },
-              { q: "ما هو معنى 'تلِم'؟", options: ["يصمت", "يتكلم", "يلعب", "ينام"], correct: 1 },
-              { q: "ماذا تعني 'حَبَاب'؟", options: ["شخص", "عائلة", "شيء", "أصدقاء"], correct: 0 },
-              { q: "ما هو معنى 'مُخْتَار'؟", options: ["مميز", "اختيار", "عادي", "غريب"], correct: 1 },
-              { q: "ماذا تعني 'دِرَابَة'؟", options: ["طريق", "مزرعة", "حصاد", "أرض زراعية"], correct: 0 },
-              { q: "ما هو معنى 'فِسْتَك'؟", options: ["مشروب", "طعام", "قطعة خشب", "كلمة"], correct: 1 },
-              { q: "ماذا تعني 'دَبْدَبة'؟", options: ["صوت", "حركة", "خطر", "طعام"], correct: 0 },
-              { q: "ما معنى 'خَرْمَة'؟", options: ["حقل", "أرض زراعية", "تسلق", "مدينة"], correct: 0 },
-              { q: "ماذا تعني 'مَجْنَة'؟", options: ["سلاح", "أداة", "دراجة", "أرض"], correct: 1 },
-              { q: "ما هو معنى 'عَزَّاب'؟", options: ["عازب", "مجموعة", "مريض", "أصدقاء"], correct: 0 },
-              { q: "ماذا تعني 'حَلْبَة'؟", options: ["ساحة", "طعام", "حقل", "شجرة"], correct: 0 },
-              { q: "ما معنى 'طَابِع'؟", options: ["صورة", "رسالة", "وثيقة", "طابع"], correct: 3 },
-              { q: "ماذا تعني 'رَمَاد'؟", options: ["حريق", "ماء", "تراب", "صحراء"], correct: 2 },
-              { q: "ما هو معنى 'دَقِيق'؟", options: ["طعام", "صغير", "قصير", "دقيق"], correct: 1 },
-              { q: "ماذا تعني 'سَجَّاد'؟", options: ["أرض", "طعام", "ملابس", "غطاء"], correct: 3 },
-              { q: "ما معنى 'نَابِت'؟", options: ["نبات", "مريض", "معاق", "جائع"], correct: 0 }
-          ],
-          "فلاحي": [
-              { q: "ماذا يعني 'المندل'؟", options: ["عصا", "شمعة", "بيت", "ساحة"], correct: 0 },
-              { q: "ما هو 'الوابور'؟", options: ["قطار", "محطة", "مركب", "طائرة"], correct: 0 },
-              { q: "ما معنى 'شَبرَة'؟", options: ["نار", "طعام", "موقد", "صاروخ"], correct: 2 },
-              { q: "ما هو معنى 'أحباب'؟", options: ["أصدقاء", "أعداء", "عائلة", "مجموعة"], correct: 0 },
-              { q: "ماذا تعني 'حَطب'؟", options: ["خشب", "ماء", "مطبخ", "باب"], correct: 0 },
-              { q: "ما معنى 'دَربَة'؟", options: ["طريق", "فقر", "حزن", "مطر"], correct: 0 },
-              { q: "ماذا تعني كلمة 'مَلّة'؟", options: ["مشكلة", "أرض زراعية", "فرحة", "تسلق"], correct: 1 },
-              { q: "ما معنى كلمة 'جَرَب'؟", options: ["مرض", "فقر", "حقل", "خوف"], correct: 0 },
-              { q: "ماذا تعني 'الطَحن'؟", options: ["كسر", "دَق", "مضغ", "طحن"], correct: 1 },
-              { q: "ما معنى 'دَأَبة'؟", options: ["غسالة", "مزرعة", "راحة", "آلة طحن"], correct: 3 },
-              { q: "ماذا تعني كلمة 'مَرْسَة'؟", options: ["شجرة", "مزرعة", "حظيرة", "مركب"], correct: 2 },
-              { q: "ما هو 'البُشْت'؟", options: ["ملابس فلاحية", "قبعة", "مطرقة", "حقيبة"], correct: 0 },
-              { q: "ما معنى 'مِغْوَل'؟", options: ["عصا", "خشب", "محراث", "حمار"], correct: 2 },
-              { q: "ماذا تعني 'البَرْنَس'؟", options: ["مشروع", "قارب", "مطرقة", "صندوق"], correct: 1 },
-              { q: "ما معنى 'عَضَّة'؟", options: ["عضو", "ضربة", "نبتة", "جرح"], correct: 3 },
-              { q: "ماذا تعني 'دَرَابَة'؟", options: ["شجرة", "أرض", "حفرة", "مطر"], correct: 1 },
-              { q: "ما هو 'البِيعَة'؟", options: ["مزرعة", "بيع", "أرض زراعية", "حقل"], correct: 2 },
-              { q: "ماذا تعني 'حَزَام'؟", options: ["حزام", "حصان", "مطر", "ملابس"], correct: 0 },
-              { q: "ما معنى 'جَفَّت'؟", options: ["جفت", "انقضت", "غسلت", "ماتت"], correct: 1 },
-              { q: "ماذا تعني 'مَفْهُوم'؟", options: ["مدرك", "وضيح", "مفقود", "مغلق"], correct: 0 }
-          ],
-          "صعيدي": [
-              { q: "ماذا تعني 'كمش'؟", options: ["غسّل", "شرب", "فجر", "أمسك"], correct: 3 },
-              { q: "ما معنى 'جِبَت'؟", options: ["جاء", "نزل", "أخذ", "ذهب"], correct: 0 },
-              { q: "ما هو 'بتاع'؟", options: ["شخص", "شيء", "حالة", "مكان"], correct: 1 },
-              { q: "ما معنى 'مخربش'؟", options: ["محبط", "غاضب", "حزين", "مسعود"], correct: 3 },
-              { q: "ماذا تعني 'كِتف'؟", options: ["ذراع", "ساق", "كتف", "صدر"], correct: 2 },
-              { q: "ماذا تعني 'مِهرَج'؟", options: ["مهرجان", "زعيم", "مقام", "مكان"], correct: 0 },
-              { q: "ما معنى 'مُعمّر'؟", options: ["بناء", "مسافر", "مزارع", "غني"], correct: 2 },
-              { q: "ما معنى 'تَفَلَ'؟", options: ["ذهب", "ضاع", "انتشر", "بقى"], correct: 1 },
-              { q: "ماذا تعني 'طَشّ'؟", options: ["رشّ", "شطف", "مطر", "شجار"], correct: 0 },
-              { q: "ما معنى 'تُلاَس'؟", options: ["تسلق", "أكمل", "نهض", "أخذ"], correct: 1 },
-              { q: "ماذا تعني 'قَاعِد'؟", options: ["جالس", "عائد", "راكب", "متوقف"], correct: 0 },
-              { q: "ما معنى 'مَشْلَح'؟", options: ["مكان خالي", "أرض زراعية", "مرتع", "ملابس"], correct: 3 },
-              { q: "ماذا تعني 'حَبَس'؟", options: ["حبس", "أنقذ", "أمسك", "فرّ"], correct: 0 },
-              { q: "ما معنى 'صَامِد'؟", options: ["قوي", "ضعيف", "مريض", "جائع"], correct: 0 },
-              { q: "ماذا تعني 'زَغَيب'؟", options: ["ورقة", "صوت", "حركة", "عصفور"], correct: 3 },
-              { q: "ما معنى 'كَبَار'؟", options: ["أطفال", "شيوخ", "أصدقاء", "فقراء"], correct: 1 },
-              { q: "ماذا تعني 'فَرَحَة'؟", options: ["حزن", "مفاجأة", "سعادة", "حاجة"], correct: 2 },
-              { q: "ما معنى 'دَحْدَح'؟", options: ["مستريح", "مستمر", "متعب", "مشغول"], correct: 0 },
-              { q: "ماذا تعني 'قَبَّق'؟", options: ["غسّل", "ركب", "صبّ", "قلب"], correct: 3 },
-              { q: "ما معنى 'مُشَكِّك'؟", options: ["مطمئن", "قوي", "مشكوك", "مربك"], correct: 2 }
-          ]
-      };
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedDialect = '';
+        let questions = [];
 
-      let currentQuestionIndex = 0;
-      let score = 0;
-      let selectedDialect = '';
-      let questions = [];
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextButton = document.getElementById('next-button');
+        const resultDiv = document.getElementById('result');
+        const scoreText = document.getElementById('score');
 
-      const questionText = document.getElementById('question-text');
-      const optionsContainer = document.getElementById('options-container');
-      const nextButton = document.getElementById('next-button');
-      const resultDiv = document.getElementById('result');
-      const scoreText = document.getElementById('score');
+        async function startQuiz(dialect) {
+            selectedDialect = dialect;
+            questions = (await fetch('questions.json').then(response => response.json()))[selectedDialect];
+            currentQuestionIndex = 0;
+            score = 0;
+            displayQuestion();
+            document.getElementById('question-container').style.display = 'block';
+            resultDiv.style.display = 'none';
+        }
 
-      function startQuiz(dialect) {
-          selectedDialect = dialect;
-          questions = dialects[selectedDialect];
-          currentQuestionIndex = 0;
-          score = 0;
-          displayQuestion();
-          document.getElementById('question-container').style.display = 'block';
-          resultDiv.style.display = 'none';
-      }
+        function displayQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                const question = questions[currentQuestionIndex];
+                questionText.textContent = question.q;
+                optionsContainer.innerHTML = '';
 
-      function displayQuestion() {
-          if (currentQuestionIndex < questions.length) {
-              const question = questions[currentQuestionIndex];
-              questionText.textContent = question.q;
-              optionsContainer.innerHTML = '';
+                question.options.forEach((option, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.classList.add('option');
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.name = 'answer';
+                    radioInput.value = index;
+                    radioInput.id = `option${index}`;
+                    const label = document.createElement('label');
+                    label.htmlFor = `option${index}`;
+                    label.textContent = option;
 
-              question.options.forEach((option, index) => {
-                  const optionDiv = document.createElement('div');
-                  optionDiv.classList.add('option');
-                  const radioInput = document.createElement('input');
-                  radioInput.type = 'radio';
-                  radioInput.name = 'answer';
-                  radioInput.value = index;
-                  radioInput.id = `option${index}`;
-                  const label = document.createElement('label');
-                  label.htmlFor = `option${index}`;
-                  label.textContent = option;
+                    optionDiv.appendChild(radioInput);
+                    optionDiv.appendChild(label);
+                    optionsContainer.appendChild(optionDiv);
+                });
 
-                  optionDiv.appendChild(radioInput);
-                  optionDiv.appendChild(label);
-                  optionsContainer.appendChild(optionDiv);
-              });
+                nextButton.style.display = 'block';
+            } else {
+                showResult();
+            }
+        }
 
-              nextButton.style.display = 'block';
-          } else {
-              showResult();
-          }
-      }
+        nextButton.addEventListener('click', () => {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                if (parseInt(selectedOption.value) === questions[currentQuestionIndex].correct) {
+                    score++;
+                }
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        });
 
-      nextButton.addEventListener('click', () => {
-          const selectedOption = document.querySelector('input[name="answer"]:checked');
-          if (selectedOption) {
-              if (parseInt(selectedOption.value) === questions[currentQuestionIndex].correct) {
-                  score++;
-              }
-              currentQuestionIndex++;
-              displayQuestion();
-          }
-      });
-
-      function showResult() {
-          nextButton.style.display = 'none';
-          resultDiv.style.display = 'block';
-          scoreText.textContent = `نتيجتك : ${score} من ${questions.length}`;
-      }
+        function showResult() {
+            nextButton.style.display = 'none';
+            resultDiv.style.display = 'block';
+            scoreText.textContent = `نتيجتك : ${score} من ${questions.length}`;
+        }
     </script>
 </body>
 </html>
