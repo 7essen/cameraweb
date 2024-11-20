@@ -204,7 +204,7 @@
                 { q: "ما معنى كلمة 'جعان'؟", options: ["محتاج", "جائع", "نعسان", "غاضب"], correct: 1 },
                 { q: "ماذا تعني 'حتة'؟", options: ["جزء", "بيت", "مكان", "شيء"], correct: 0 },
                 { q: "ما معنى 'فايق'؟", options: ["مستيقظ", "مريض", "غاضب", "مستمتع"], correct: 0 },
-                { q: "ماذا تعني كلمة 'دِرَاج'؟", options: ["بسيط", "غريب", "درّاجه", "غرفه"], correct: 2 },
+                { q: "ماذ�� تعني كلمة 'دِرَاج'؟", options: ["بسيط", "غريب", "درّاجه", "غرفه"], correct: 2 },
                 { q: "ما معنى كلمة 'حَلَاب'؟", options: ["أشياء", "غروب", "خُطَط", "جمل"], correct: 3 }
             ],
             "منياوي": [
@@ -259,57 +259,51 @@
             }
         }
 
-        function displayQuestion() {
-            if (currentQuestionIndex < questions.length) {
-                const question = questions[currentQuestionIndex];
-                questionText.textContent = question.q;
-                optionsContainer.innerHTML = '';
-
-                const shuffledOptions = [...question.options];
-                shuffleQuestions(shuffledOptions);
-
-                shuffledOptions.forEach((option, index) => {
-                    const optionDiv = document.createElement('div');
-                    optionDiv.classList.add('option');
-                    const radioInput = document.createElement('input');
-                    radioInput.type = 'radio';
-                    radioInput.name = 'answer';
-                    radioInput.value = shuffledOptions.indexOf(option);
-                    radioInput.id = `option${index}`;
-                    optionDiv.addEventListener('click', () => {
-                        radioInput.checked = true;
-                    });
-                    const label = document.createElement('label');
-                    label.htmlFor = `option${index}`;
-                    label.textContent = option;
-
-                    optionDiv.appendChild(radioInput);
-                    optionDiv.appendChild(label);
-                    optionsContainer.appendChild(optionDiv);
-                });
-
-                nextButton.style.display = 'block';
-            } else {
-                showResult();
+        function handleAnswer(selectedOption) {
+            const question = questions[currentQuestionIndex];
+            const correctOption = question.correct;
+            if (selectedOption === correctOption) {
+                score++;
             }
+
+            nextButton.style.display = 'block';
         }
 
         nextButton.addEventListener('click', () => {
-            const selectedOption = document.querySelector('input[name="answer"]:checked');
-            if (selectedOption) {
-                if (parseInt(selectedOption.value) === questions[currentQuestionIndex].correct) {
-                    score++;
-                }
-                currentQuestionIndex++;
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
                 displayQuestion();
+                nextButton.style.display = 'none';
+            } else {
+                showResult();
             }
         });
 
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionText.textContent = question.q;
+            optionsContainer.innerHTML = '';
+
+            const shuffledOptions = [...question.options];
+            shuffleQuestions(shuffledOptions);
+
+            shuffledOptions.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.classList.add('option');
+                optionDiv.addEventListener('click', () => handleAnswer(index));
+
+                const label = document.createElement('label');
+                label.textContent = option;
+
+                optionDiv.appendChild(label);
+                optionsContainer.appendChild(optionDiv);
+            });
+        }
+
         function showResult() {
-            nextButton.style.display = 'none';
-            document.getElementById('question-container').style.display = 'none';
             resultDiv.style.display = 'block';
-            scoreText.textContent = `نتيجتك : ${score} من ${questions.length}`;
+            scoreText.textContent = `النتيجة: ${score} من ${questions.length}`;
+            document.getElementById('quiz-container').style.display = 'none';
         }
     </script>
 </body>
