@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #FF6F00, #FFD54F);
+            color: white;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        form {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        button {
+            background: #4CAF50;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #388E3C;
+        }
+
+        .result {
+            font-size: 16px;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>اختبار اللغة الفلاحية</h1>
+        <form id="quiz-form">
+            <p>ما معنى الكلمة "مرساح"؟</p>
+            <input type="radio" name="answer" value="راحة"> راحة<br>
+            <input type="radio" name="answer" value="عجل"> عجل<br>
+            <input type="radio" name="answer" value="باب"> باب<br>
+            <button type="button" id="submit-quiz">تحقق</button>
+        </form>
+        <div class="result" id="quiz-result"></div>
+    </div>
+
+    <script>
+        const quizForm = document.getElementById('quiz-form');
+        const quizResult = document.getElementById('quiz-result');
+        const submitQuizButton = document.getElementById('submit-quiz');
+
+        submitQuizButton.addEventListener('click', () => {
+            const selectedAnswer = quizForm.elements['answer'].value;
+            if (selectedAnswer === "راحة") {
+                quizResult.textContent = "✅ إجابة صحيحة!";
+                quizResult.style.color = "green";
+            } else {
+                quizResult.textContent = "❌ إجابة خاطئة!";
+                quizResult.style.color = "red";
+            }
+            quizResult.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
