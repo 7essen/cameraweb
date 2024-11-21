@@ -137,6 +137,9 @@ button:hover {
 .correct-answer {
     background-color: #FFEB3B;
 }
+#question-text {
+            margin-bottom: 30px; /* مسافة بين نص السؤال والإجابات */
+}
 .face-shape {
     position: absolute;
     top: 50%;
